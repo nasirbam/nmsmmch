@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NURSES MANAGEMENT SYSTEM (NMS) BY NASIR</title>
+<title>NMS BY NASIR</title>
 <style>
 :root{--bg:#f4f7f9;--card:#fff;--tx:#1b2a33;--mu:#667985;--pr:#0f766e;--bd:#d8e2e7;--dg:#c0392b;--tkb:#fff1f0;--tkc:#d00000;--rb:#fde3e1}
 @media(prefers-color-scheme:dark){:root{--bg:#10191e;--card:#18242b;--tx:#e6eef2;--mu:#93a6b1;--pr:#2dd4bf;--bd:#2b3d47;--dg:#f07167;--tkb:#2a1514;--tkc:#ff6b6b;--rb:#4a1f1d}}
@@ -186,7 +186,7 @@ function loginV(){const ad=S.lr=='admin';return `<div class="lgw"><div class="de
 <label>${ad?t('Username'):'Phone No. (User ID)'}</label><input id="lu" inputmode="${ad?'text':'tel'}"><label>${t('Password')}</label><input id="lp" type="password" onkeydown="if(event.key=='Enter')login()">
 <button class="p" style="width:100%;margin-top:14px;padding:10px" onclick="login()">${t('Login')}</button>
 ${ad?'':`<button style="width:100%;margin-top:8px" onclick="regForm()">📝 ${t('Register')} (Admin approval required)</button>`}
-<p class="mu" style="font-size:11px;text-align:center">Admin: admin / admin123 · Nurse default password: 1234</p></div></div>`}
+<p class="mu" style="font-size:11px;text-align:center"> · Nurse default password: 1234</p></div></div>`}
 function login(){const u=$('#lu').value.trim(),p=$('#lp').value;
  if(S.lr=='admin'){if(u==db.admin.u&&p==db.admin.p){S.user={role:'admin'};S.tab='nurses'}else return alert('Wrong login')}
  else{const n=db.nurses.find(n=>n.phone==u&&(n.pass||'1234')==p);if(!n)return alert('Wrong login');if(n.st=='pend')return alert('Registration is pending admin approval');S.user={role:'staff',id:n.id};S.tab='profile';S.ward=''}R();try{Notification.requestPermission()}catch(e){}welcome()}
