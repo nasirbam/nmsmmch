@@ -1,0 +1,6 @@
+{
+  "name": "NMS Nurses",
+  "description": "Nurses Management System (NMS) for hospital duty roster, attendance, leave approvals, ACR, and staff management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
