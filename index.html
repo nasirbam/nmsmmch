@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NURSES MANAGEMENT SYSTEM (NMS) BY NASIR</title>
+<style>
+:root{--bg:#f4f7f9;--card:#fff;--tx:#1b2a33;--mu:#667985;--pr:#0f766e;--bd:#d8e2e7;--dg:#c0392b;--tkb:#fff1f0;--tkc:#d00000;--rb:#fde3e1}
+@media(prefers-color-scheme:dark){:root{--bg:#10191e;--card:#18242b;--tx:#e6eef2;--mu:#93a6b1;--pr:#2dd4bf;--bd:#2b3d47;--dg:#f07167;--tkb:#2a1514;--tkc:#ff6b6b;--rb:#4a1f1d}}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--tx);font-size:15px;min-height:100vh;display:flex;flex-direction:column}
+body.lgin{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180' fill='none' stroke='white' stroke-opacity='.3' stroke-width='1.3'%3E%3Ccircle cx='90' cy='90' r='7'/%3E%3Ccircle cx='90' cy='90' r='19'/%3E%3Ccircle cx='90' cy='90' r='46' stroke-dasharray='2 5'/%3E%3Cpath d='M90 82v16M82 90h16' stroke-width='2.2'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(0 90 90)'/%3E%3Ccircle cx='90.0' cy='32.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(45 90 90)'/%3E%3Ccircle cx='131.0' cy='49.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(90 90 90)'/%3E%3Ccircle cx='148.0' cy='90.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(135 90 90)'/%3E%3Ccircle cx='131.0' cy='131.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(180 90 90)'/%3E%3Ccircle cx='90.0' cy='148.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(225 90 90)'/%3E%3Ccircle cx='49.0' cy='131.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(270 90 90)'/%3E%3Ccircle cx='32.0' cy='90.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(315 90 90)'/%3E%3Ccircle cx='49.0' cy='49.0' r='3'/%3E%3Ccircle cx='0' cy='0' r='16'/%3E%3Ccircle cx='0' cy='0' r='34' stroke-dasharray='2 5'/%3E%3Ccircle cx='180' cy='0' r='16'/%3E%3Ccircle cx='180' cy='0' r='34' stroke-dasharray='2 5'/%3E%3Ccircle cx='0' cy='180' r='16'/%3E%3Ccircle cx='0' cy='180' r='34' stroke-dasharray='2 5'/%3E%3Ccircle cx='180' cy='180' r='16'/%3E%3Ccircle cx='180' cy='180' r='34' stroke-dasharray='2 5'/%3E%3Ccircle cx='90' cy='0' r='6'/%3E%3Cellipse cx='90' cy='-13' rx='4' ry='8' transform='rotate(0 90 0)'/%3E%3Cellipse cx='90' cy='-13' rx='4' ry='8' transform='rotate(90 90 0)'/%3E%3Cellipse cx='90' cy='-13' rx='4' ry='8' transform='rotate(180 90 0)'/%3E%3Cellipse cx='90' cy='-13' rx='4' ry='8' transform='rotate(270 90 0)'/%3E%3Ccircle cx='0' cy='90' r='6'/%3E%3Cellipse cx='0' cy='77' rx='4' ry='8' transform='rotate(0 0 90)'/%3E%3Cellipse cx='0' cy='77' rx='4' ry='8' transform='rotate(90 0 90)'/%3E%3Cellipse cx='0' cy='77' rx='4' ry='8' transform='rotate(180 0 90)'/%3E%3Cellipse cx='0' cy='77' rx='4' ry='8' transform='rotate(270 0 90)'/%3E%3Ccircle cx='180' cy='90' r='6'/%3E%3Cellipse cx='180' cy='77' rx='4' ry='8' transform='rotate(0 180 90)'/%3E%3Cellipse cx='180' cy='77' rx='4' ry='8' transform='rotate(90 180 90)'/%3E%3Cellipse cx='180' cy='77' rx='4' ry='8' transform='rotate(180 180 90)'/%3E%3Cellipse cx='180' cy='77' rx='4' ry='8' transform='rotate(270 180 90)'/%3E%3Ccircle cx='90' cy='180' r='6'/%3E%3Cellipse cx='90' cy='167' rx='4' ry='8' transform='rotate(0 90 180)'/%3E%3Cellipse cx='90' cy='167' rx='4' ry='8' transform='rotate(90 90 180)'/%3E%3Cellipse cx='90' cy='167' rx='4' ry='8' transform='rotate(180 90 180)'/%3E%3Cellipse cx='90' cy='167' rx='4' ry='8' transform='rotate(270 90 180)'/%3E%3Cpath d='M90 38C70 24 110 14 90 0M90 142C70 156 110 166 90 180M38 90C24 70 14 110 0 90M142 90C156 70 166 110 180 90'/%3E%3C/svg%3E") 0 0/180px 180px,radial-gradient(circle at 15% 15%,#14b8a6 0,transparent 45%),radial-gradient(circle at 85% 85%,#6366f1 0,transparent 50%),linear-gradient(135deg,#0b3b5a,#0f766e);position:relative}
+body.lgin::after{content:"";position:fixed;left:0;right:0;bottom:70px;height:70px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='70' viewBox='0 0 420 70' fill='none' stroke='white' stroke-opacity='.55' stroke-width='2.5' stroke-linejoin='round'%3E%3Cpath d='M0 35H120L135 35L145 10L158 60L170 35H220L230 26L240 35H270L282 4L296 64L310 35H420'/%3E%3C/svg%3E") repeat-x;pointer-events:none;opacity:.8}
+.deco span{position:absolute;font-size:36px;opacity:.35;animation:fl 6s ease-in-out infinite}@keyframes fl{50%{transform:translateY(-14px) rotate(6deg)}}
+.logo{width:84px;height:84px;margin:-66px auto 6px;border-radius:50%;background:linear-gradient(135deg,#14b8a6,#2563eb);display:flex;align-items:center;justify-content:center;font-size:42px;border:4px solid #fff;box-shadow:0 8px 20px #0005}
+.top{background:#0b1f26;color:#cfe;font-size:12px;text-align:center;padding:4px}
+header{background:var(--pr);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+@media(prefers-color-scheme:dark){header{color:#06201d}}
+header b{letter-spacing:.3px}
+.tick{background:var(--tkb);border-bottom:2px solid var(--dg);color:var(--tkc);overflow:hidden;white-space:nowrap;padding:6px 0}
+.tick span{display:inline-block;padding-left:100%;animation:mq linear infinite}.tick:hover span{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-100%)}}
+#tk{position:sticky;top:0;z-index:20}.cat{background:#f59e0b;color:#111;font-weight:700;border:1px solid #92400e}
+.rt{min-width:0}.rt th,.rt td{border:1px solid var(--tx);padding:2px 3px;text-align:center;font-size:12px;white-space:nowrap}.rt td.nm{text-align:left;min-width:120px}
+.rt select{appearance:none;-webkit-appearance:none;border:0;background:transparent;padding:2px 0;width:28px;text-align:center;font-weight:800;font-size:15px;color:inherit;cursor:pointer}
+.rt option{color:#111;background:#fff}.rt td.ed0 select{color:var(--mu)}
+.tM{background:#dbeafe;color:#1d4ed8}.tE{background:#ffedd5;color:#c2410c}.tN{background:#ede9fe;color:#6d28d9}
+.rt td.tM,.rt td.tE,.rt td.tN{font-weight:800;font-size:15px}.rt td.pq{outline:2px dashed #d97706;outline-offset:-2px}
+.rt td.lv{background:var(--rb);color:var(--dg);font-weight:700}
+@media(prefers-color-scheme:dark){.tM{background:#1e3a8a;color:#bfdbfe}.tE{background:#7c2d12;color:#fed7aa}.tN{background:#4c1d95;color:#ddd6fe}}
+main{max-width:1150px;width:100%;margin:0 auto;padding:14px;flex:1}
+footer{text-align:center;font-size:12.5px;color:var(--mu);padding:14px;border-top:1px solid var(--bd)}
+body.lgin footer{color:#dbe;border-color:#fff3}body.lgin footer a{color:#fff}
+footer a{color:var(--pr)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px}
+.lgw{min-height:70vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}@media(max-width:600px){.deco span{font-size:26px;opacity:.25}}
+.lg{max-width:400px;width:100%;margin-top:52px;position:relative;z-index:1;box-shadow:0 20px 50px #0007;border-radius:16px;padding:22px;border-top:5px solid #14b8a6}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+button,select,input,textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:7px;padding:7px 10px}
+button{cursor:pointer}button.p{background:var(--pr);color:#fff;border-color:var(--pr)}
+@media(prefers-color-scheme:dark){button.p,button.on{color:#06201d}}
+button.d{color:var(--dg)}button.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+input,select,textarea{width:100%}label{display:block;font-size:13px;color:var(--mu);margin:8px 0 3px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.row>*{width:auto}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{border-bottom:1px solid var(--bd);padding:7px;text-align:left;vertical-align:top;font-size:14px}th{color:var(--mu);font-weight:600}
+.chip{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:1px 8px;margin:2px;font-size:12px}
+.chip.red{background:var(--rb);border-color:var(--dg);color:var(--dg);font-weight:600}.chip.pq{border-style:dashed}
+.chip b{cursor:pointer;color:var(--dg);margin-left:4px}
+.ov{position:fixed;inset:0;background:#0008;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:20px;z-index:60}
+.ov .card{max-width:680px;width:100%}.mu{color:var(--mu)}.tag{font-size:12px;padding:2px 8px;border-radius:10px;background:var(--bd)}
+@media(max-width:600px){main{padding:8px}nav{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}nav button{white-space:nowrap}th,td{padding:5px;font-size:13px}.ov{padding:6px}header b{font-size:12.5px}}
+@media print{.top,header,nav,.np,.tick{display:none!important}body{background:#fff}}
+
+/* ---- theme v5 ---- */
+:root{--bg:#eaf3fb;--pr:#0d9488;--ac:#6366f1;--th:#e0f2fe;--thc:#075985;--sh:0 4px 14px #0f766e22}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1722;--th:#12324a;--thc:#9bd7ff;--sh:0 4px 14px #0008}}
+body{background:var(--bg)}
+header{background:linear-gradient(90deg,#0f766e,#2563eb 55%,#7c3aed);color:#fff!important;box-shadow:0 3px 12px #0004}
+header button{background:#ffffff26;color:#fff;border:1px solid #fff6}
+.card{box-shadow:var(--sh);border-top:3px solid var(--pr)}.card .card{border-top:3px solid var(--ac)}
+h3{color:var(--pr)}h4{color:var(--ac)}
+th{background:var(--th);color:var(--thc)}
+tr:hover>td{background:#14b8a614}
+nav button{border-radius:999px;font-weight:600;padding:8px 14px;border:1px solid var(--bd)}
+button{transition:.15s}button:hover{filter:brightness(1.07)}
+button.p,button.on,nav button.on{background:linear-gradient(135deg,#0d9488,#2563eb);color:#fff!important;border-color:transparent;box-shadow:0 3px 8px #2563eb44}
+.tag{background:#e0e7ff;color:#3730a3;font-weight:600}.tag.cat{background:#f59e0b;color:#111}
+@media(prefers-color-scheme:dark){.tag{background:#312e81;color:#c7d2fe}.tag.cat{background:#f59e0b;color:#111}}
+.chip{border-color:#a5b4fc}
+.rt tr.inc td{background:#fef3c755}.rt tr.inc td.nm{font-weight:700;color:var(--pr)}
+.bell{position:relative;font-size:16px;padding:5px 10px}.bdg{position:absolute;top:-7px;right:-6px;background:#ef4444;color:#fff;border-radius:10px;font-size:11px;padding:0 6px;font-weight:700}
+.toast{position:fixed;right:12px;bottom:12px;background:linear-gradient(135deg,#0f766e,#2563eb);color:#fff;padding:12px 16px;border-radius:12px;z-index:70;box-shadow:0 8px 24px #0006;cursor:pointer;max-width:90vw}
+.nt{border-left:4px solid var(--pr);padding:6px 10px;margin:6px 0;background:var(--bg);border-radius:6px}.nt.new{border-left-color:#ef4444;background:var(--rb)}
+body.lgin{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180' fill='none' stroke='white' stroke-opacity='.3' stroke-width='1.3'%3E%3Ccircle cx='90' cy='90' r='7'/%3E%3Ccircle cx='90' cy='90' r='19'/%3E%3Ccircle cx='90' cy='90' r='46' stroke-dasharray='2 5'/%3E%3Cpath d='M90 82v16M82 90h16' stroke-width='2.2'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(0 90 90)'/%3E%3Ccircle cx='90.0' cy='32.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(45 90 90)'/%3E%3Ccircle cx='131.0' cy='49.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(90 90 90)'/%3E%3Ccircle cx='148.0' cy='90.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(135 90 90)'/%3E%3Ccircle cx='131.0' cy='131.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(180 90 90)'/%3E%3Ccircle cx='90.0' cy='148.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(225 90 90)'/%3E%3Ccircle cx='49.0' cy='131.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(270 90 90)'/%3E%3Ccircle cx='32.0' cy='90.0' r='3'/%3E%3Cellipse cx='90' cy='60' rx='6' ry='13' transform='rotate(315 90 90)'/%3E%3Ccircle cx='49.0' cy='49.0' r='3'/%3E%3Ccircle cx='0' cy='0' r='16'/%3E%3Ccircle cx='0' cy='0' r='34' stroke-dasharray='2 5'/%3E%3Ccircle cx='180' cy='0' r='16'/%3E%3Ccircle cx='180' cy='0' r='34' stroke-dasharray='2 5'/%3E%3Ccircle cx='0' cy='180' r='16'/%3E%3Ccircle cx='0' cy='180' r='34' stroke-dasharray='2 5'/%3E%3Ccircle cx='180' cy='180' r='16'/%3E%3Ccircle cx='180' cy='180' r='34' stroke-dasharray='2 5'/%3E%3Ccircle cx='90' cy='0' r='6'/%3E%3Cellipse cx='90' cy='-13' rx='4' ry='8' transform='rotate(0 90 0)'/%3E%3Cellipse cx='90' cy='-13' rx='4' ry='8' transform='rotate(90 90 0)'/%3E%3Cellipse cx='90' cy='-13' rx='4' ry='8' transform='rotate(180 90 0)'/%3E%3Cellipse cx='90' cy='-13' rx='4' ry='8' transform='rotate(270 90 0)'/%3E%3Ccircle cx='0' cy='90' r='6'/%3E%3Cellipse cx='0' cy='77' rx='4' ry='8' transform='rotate(0 0 90)'/%3E%3Cellipse cx='0' cy='77' rx='4' ry='8' transform='rotate(90 0 90)'/%3E%3Cellipse cx='0' cy='77' rx='4' ry='8' transform='rotate(180 0 90)'/%3E%3Cellipse cx='0' cy='77' rx='4' ry='8' transform='rotate(270 0 90)'/%3E%3Ccircle cx='180' cy='90' r='6'/%3E%3Cellipse cx='180' cy='77' rx='4' ry='8' transform='rotate(0 180 90)'/%3E%3Cellipse cx='180' cy='77' rx='4' ry='8' transform='rotate(90 180 90)'/%3E%3Cellipse cx='180' cy='77' rx='4' ry='8' transform='rotate(180 180 90)'/%3E%3Cellipse cx='180' cy='77' rx='4' ry='8' transform='rotate(270 180 90)'/%3E%3Ccircle cx='90' cy='180' r='6'/%3E%3Cellipse cx='90' cy='167' rx='4' ry='8' transform='rotate(0 90 180)'/%3E%3Cellipse cx='90' cy='167' rx='4' ry='8' transform='rotate(90 90 180)'/%3E%3Cellipse cx='90' cy='167' rx='4' ry='8' transform='rotate(180 90 180)'/%3E%3Cellipse cx='90' cy='167' rx='4' ry='8' transform='rotate(270 90 180)'/%3E%3Cpath d='M90 38C70 24 110 14 90 0M90 142C70 156 110 166 90 180M38 90C24 70 14 110 0 90M142 90C156 70 166 110 180 90'/%3E%3C/svg%3E") 0 0/180px 180px,linear-gradient(125deg,#0ea5e9,#6366f1,#d946ef,#f97316,#10b981,#0ea5e9);background-size:180px 180px,400% 400%;animation:gs 16s ease infinite}
+@keyframes gs{0%{background-position:0 0,0% 50%}50%{background-position:0 0,100% 50%}100%{background-position:0 0,0% 50%}}
+.lg{background:rgba(255,255,255,.94);border-top:5px solid #f59e0b;backdrop-filter:blur(6px)}
+@media(prefers-color-scheme:dark){.lg{background:rgba(24,36,43,.94)}}
+.lgt{background:linear-gradient(90deg,#0d9488,#2563eb,#c026d3);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:32px;font-weight:800}
+.logo{animation:pl 3s ease-in-out infinite;background:conic-gradient(from 200deg,#14b8a6,#6366f1,#ec4899,#f59e0b,#14b8a6)}
+@keyframes pl{50%{box-shadow:0 0 0 14px #ffffff2e,0 8px 20px #0005}}
+body.lgin .lg button.p{padding:11px}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.rt td.fr,.rt th.fr{background:#fde68a!important;color:#111}
+.rt td.ho,.rt th.ho{background:#86efac!important;color:#111}
+.rt .dn{font-size:10px;font-weight:700}
+.tD{background:#cffafe;color:#0e7490}.rt td.tD{font-weight:800;font-size:12px}.rt td.tD select{font-size:12px;width:34px}
+@media(prefers-color-scheme:dark){.tD{background:#164e63;color:#a5f3fc}}.rt th.fr .dn{color:#b45309}.rt th.ho .dn{color:#166534}
+.hl{display:inline-block;padding:2px 9px;border-radius:10px;font-size:12px;margin:2px;color:#111}.hl.fr{background:#fde68a}.hl.ho{background:#86efac}
+@media(prefers-color-scheme:dark){.rt td.fr,.rt th.fr{background:#78560a!important;color:#fff}.rt td.ho,.rt th.ho{background:#14532d!important;color:#fff}.rt th.fr .dn,.rt th.ho .dn{color:#fff}}
+</style></head><body>
+<div class="top np" id="clk"></div>
+<header class="np"><b>🩺 NURSES MANAGEMENT SYSTEM (NMS) BY NASIR</b><span id="who"></span></header>
+<div id="tk"></div>
+<main id="app"></main>
+<footer id="ft"></footer>
+<script>
+const L='en';
+const t=s=>s;
+const SH={M:"Morning (8am–2pm)",E:"Evening (2pm–8pm)",N:"Night (8pm–8am)",D:"Day Off (D/O)"};
+const SL=s=>s=='D'?'D/O':s;
+const BASE=[["name","Name"],["father","Father's Name"],["mother","Mother's Name"],["dob","Date of Birth","date"],["workplace","Workplace"],["phone","Phone No. (Login ID) *","tel"],["reg","BNMC Reg. No."],["hris","HRIS ID *"],["join","Joining Date","date"],["course","Course"]];
+const CATS=['Nurse Incharge','Senior Staff Nurse','Staff Nurse','Nursing Supervisor','Deputy Nursing Superintendent','Nursing Superintendent'];
+const RK={'Staff Nurse':1,'Senior Staff Nurse':1,'Nurse Incharge':2,'Nursing Supervisor':3,'Deputy Nursing Superintendent':4,'Nursing Superintendent':5};
+const NEED={NI:2,SUP:3,FIN:4};
+const CH={leave:['NI','SUP','FIN'],duty:['NI','SUP'],tr:['FIN']};
+const STL={NI:'Pending: Nurse Incharge',SUP:'Pending: Nursing Supervisor',FIN:'Pending: DNS/Nursing Supt. (final)',OK:'Approved',REJ:'Rejected'};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=s=>document.querySelector(s);
+const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b><u>$1</u></b>');
+const today=()=>new Date().toISOString().slice(0,10);
+let db,S={user:null,tab:'nurses',ward:'',wk:today(),q:'',ad:today(),ld:today(),lt:'',lm:'on',lw:'',lg:'',am:today().slice(0,7),rm:today().slice(0,7),ay:String(new Date().getFullYear()),lr:'staff'};
+const HOL26=['2026-02-04|Shab-e-Barat','2026-02-11|National Election holiday','2026-02-12|National Election holiday','2026-02-21|Shaheed Dibosh & International Mother Language Day','2026-03-17|Shab-e-Qadr','2026-03-18|Eid-ul-Fitr holiday (executive order)','2026-03-19|Eid-ul-Fitr holiday (executive order)','2026-03-20|Jumatul Wida','2026-03-21|Eid-ul-Fitr','2026-03-22|Eid-ul-Fitr holiday (executive order)','2026-03-23|Eid-ul-Fitr holiday (executive order)','2026-03-26|Independence & National Day','2026-04-14|Pohela Boishakh (Bengali New Year)','2026-05-01|May Day / Buddha Purnima','2026-05-25|Eid-ul-Adha holiday (executive order)','2026-05-26|Eid-ul-Adha holiday (executive order)','2026-05-27|Eid-ul-Adha (Eve)','2026-05-28|Eid-ul-Adha','2026-05-29|Eid-ul-Adha (2nd day)','2026-05-30|Eid-ul-Adha (3rd day)','2026-05-31|Eid-ul-Adha holiday (executive order)','2026-06-26|Ashura','2026-08-05|July Mass Uprising Day','2026-08-26|Eid-e-Miladunnabi','2026-09-04|Janmashtami','2026-10-20|Durga Puja','2026-10-21|Durga Puja (Vijaya Dashami)','2026-12-16|Victory Day','2026-12-25|Christmas Day'];
+function load(){try{db=JSON.parse(localStorage.getItem('nurseapp'))}catch(e){}
+ const D={admin:{u:'admin',p:'admin123'},wards:['Medicine','Surgery','ICU','Pediatrics','Gynae & Obs'],nurses:[],fields:[],secs:[],roster:{},rq:[],complaints:[],leaves:[],notes:[],hol:[],clMax:20,att:{},atm:{},acr:{},
+ news:[{id:'n1',text:'**Welcome!** Welcome to NMS. **Important notices** will appear here.'}],footer:{h:'',a:'',l:''},
+ leaveTypes:[{c:'CL',n:'Casual Leave',ne:1},{c:'ML',n:'Maternity Leave'},{c:'EL',n:'Earn Leave'},{c:'RRL',n:'Rest & Recreation Leave'}],
+ attTypes:[{c:'P',n:'Present'},{c:'A',n:'Absent'},{c:'Late',n:'Late'}]};
+ db=Object.assign(D,db||{});
+ db.complaints.forEach(c=>{if(!c.log){c.log=c.reply?[{by:'',role:'Admin',text:c.reply,act:'Replied',date:c.date}]:[];c.status=c.reply?'closed':'open';c.lvl=2}});
+ if(!db.holSeed26){HOL26.forEach(x=>{const [d,n]=x.split('|');if(!db.hol.some(h=>h.date==d))db.hol.push({date:d,name:n})});db.hol.sort((a,b)=>a.date.localeCompare(b.date));db.holSeed26=1}
+ db.leaveTypes.forEach(x=>{if(x.ne===undefined&&['D/O','DO','CL'].includes(x.c))x.ne=1});
+ if(!db.doMoved){db.leaveTypes=db.leaveTypes.filter(x=>x.c!='D/O'&&x.c!='DO');db.leaves=db.leaves.filter(l=>{if(l.type!='D/O'&&l.type!='DO')return true;if(l.stage!='REJ'){const w=(db.nurses.find(n=>n.id==l.nurse)||{}).ward||'';dayList(l.from,l.to).forEach(d=>{if(l.stage=='OK'||l.stage=='FIN'){const k=d+'|'+w+'|D',a=db.roster[k]=db.roster[k]||[];if(!a.includes(l.nurse))a.push(l.nurse)}else db.rq.push({id:uid(),type:'duty',nurse:l.nurse,date:d,ward:w,shift:'D',stage:l.stage})})}return false});db.doMoved=1}
+ db.nurses.forEach(n=>{n.st=n.st||'ok';n.cat=n.cat||'Staff Nurse';n.hris=n.hris||'';n.x=n.x||{}});
+ db.leaves.forEach(l=>{if(!l.stage)l.stage=l.status=='Approved'?'OK':l.status=='Rejected'?'REJ':'SUP'})}
+function save(){try{localStorage.setItem('nurseapp',JSON.stringify(db))}catch(e){alert('Save failed')}}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const NU=id=>db.nurses.find(n=>n.id==id)||{};
+const nm=id=>NU(id).name||'(deleted)';
+const me=()=>NU(S.user.id);
+const isAd=()=>S.user&&S.user.role=='admin';
+const rk=()=>isAd()?9:RK[me().cat]||1;
+const ty=c=>db.leaveTypes.find(x=>x.c==c)||{c,n:c};
+const tn=x=>L=='bn'&&x.bn?x.bn:t(x.n);
+const isNE=c=>!!ty(c).ne||['CL'].includes(c);
+const dd=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5)+1;
+const eff=l=>l.stage=='OK'||(isNE(l.type)&&l.stage=='FIN');
+const onLeave=(id,d)=>db.leaves.find(l=>l.nurse==id&&eff(l)&&l.from<=d&&d<=l.to);
+const init=(ch,r)=>CH[ch].find(s=>NEED[s]>r)||'OK';
+const nxt=(ch,st,r)=>{const a=CH[ch];let i=a.indexOf(st)+1;while(i<a.length&&NEED[a[i]]<=r)i++;return i<a.length?a[i]:'OK'};
+const canAct=(st,n)=>{const r=rk();if(!NEED[st])return false;if(r==9)return true;if(n.id==S.user.id)return false;if(st=='NI')return r==2&&n.ward==me().ward;if(st=='SUP')return r==3;return r>=4};
+const shiftOf=(id,d,w)=>{const q=db.rq.find(q=>q.type=='duty'&&q.nurse==id&&q.date==d&&q.ward==w&&NEED[q.stage]);if(q)return {s:q.shift,q};return {s:Object.keys(SH).find(s=>(db.roster[d+'|'+w+'|'+s]||[]).includes(id))||'',q:null}};
+const getv=(n,k)=>BASE.some(b=>b[0]==k)||k=='ward'||k=='cat'?n[k]:(n.x||{})[k];
+const stg=l=>STL[l.stage]+(l.stage=='FIN'&&isNE(l.type)?' ✓ effective':'');
+const hasDuty=(id,d)=>Object.keys(db.roster).some(k=>k.startsWith(d+'|')&&db.roster[k].includes(id))||db.rq.some(q=>q.type=='duty'&&q.date==d&&q.nurse==id&&NEED[q.stage]);
+function dayList(f,e){const a=[],x=new Date(f+'T00:00:00Z'),z=new Date(e+'T00:00:00Z');while(x<=z){a.push(x.toISOString().slice(0,10));x.setUTCDate(x.getUTCDate()+1)}return a}
+const used=(id,c,pr,ex)=>db.leaves.filter(l=>l.nurse==id&&l.type==c&&l.stage!='REJ'&&l.id!=ex).reduce((s,l)=>s+dayList(l.from,l.to).filter(pr).length,0);
+const holN=m=>{const [y,mo]=m.split('-').map(Number),n=new Date(y,mo,0).getDate();let c=0;for(let i=1;i<=n;i++){const d=m+'-'+String(i).padStart(2,'0');if(dow(d)==5||db.hol.some(h=>h.date==d))c++}return c};
+const clLeft=(id,y)=>db.clMax-used(id,'CL',d=>d.slice(0,4)==y);
+const doDue=(id,m)=>holN(m)-used(id,'D/O',d=>d.slice(0,7)==m);
+const lsum=(id,m)=>`CL left ${clLeft(id,m.slice(0,4))}`;
+const doUsedM=(id,m,ex)=>Object.keys(db.roster).filter(k=>k.startsWith(m)&&k.split('|')[2]=='D'&&k.split('|')[0]!=ex&&db.roster[k].includes(id)).length+db.rq.filter(q=>q.type=='duty'&&q.shift=='D'&&NEED[q.stage]&&q.nurse==id&&q.date.startsWith(m)&&q.date!=ex).length;
+function checkLeave(id,c,f,e,ex){if(isAd())return '';const ds=dayList(f,e);
+ if(c=='CL')for(const y of new Set(ds.map(d=>d.slice(0,4))))if(used(id,'CL',d=>d.slice(0,4)==y,ex)+ds.filter(d=>d.slice(0,4)==y).length>db.clMax)return `CL limit exceeded for ${y} (max ${db.clMax} days/year)`;
+ if(c=='D/O')for(const m of new Set(ds.map(d=>d.slice(0,7))))if(used(id,'D/O',d=>d.slice(0,7)==m,ex)+ds.filter(d=>d.slice(0,7)==m).length>holN(m))return `D/O limit exceeded for ${m} (only ${holN(m)} off-days that month: Fridays + govt holidays)`;
+ return ''}
+const canHandle=c=>{if(c.status!='open')return false;if(isAd())return true;const r=rk();if(r<c.lvl||c.lvl>5||c.by==S.user.id)return false;if(r==2&&NU(c.by).ward!=me().ward)return false;return true};
+const ICON={news:'📢',duty:'📅',leave:'🏖'};
+const actor=()=>isAd()?'Admin':me().name+' ('+me().cat+')';
+const myId=()=>S.user?(S.user.id||'admin'):'';
+function notify(text,type,o={}){db.notes.push({id:uid(),ts:Date.now(),text,type,ward:o.ward||'',ids:o.ids||[],all:!!o.all,by:myId()});if(db.notes.length>300)db.notes.splice(0,db.notes.length-300)}
+const seenOf=()=>isAd()?(db.ans||0):(me().ns||0);
+const myNotes=()=>db.notes.filter(n=>{if(isAd()||n.all||rk()>=3)return true;const m=me();return n.ids.includes(m.id)||(n.ward&&n.ward==m.ward)});
+const unread=()=>myNotes().filter(n=>n.ts>seenOf()&&n.by!=myId());
+function bell(){const u=unread().length;return `<button class="bell" onclick="showNotes()">🔔${u?`<span class="bdg">${u}</span>`:''}</button> `}
+function showNotes(){const sn=seenOf(),L2=myNotes().slice(-60).reverse();
+ modal(`<h3>🔔 Notifications</h3>${L2.map(n=>`<div class="nt ${n.ts>sn&&n.by!=myId()?'new':''}">${ICON[n.type]||'🔔'} ${esc(n.text)}<br><small class="mu">${new Date(n.ts).toLocaleString('en-GB')}</small></div>`).join('')||'<p class="mu">No notifications yet.</p>'}<div class="row"><button onclick="$('#modal').remove()">Close</button></div>`);
+ if(isAd())db.ans=Date.now();else me().ns=Date.now();save();R()}
+function toast(m){const d=document.createElement('div');d.className='toast';d.textContent=m;d.onclick=()=>{d.remove();showNotes()};document.body.appendChild(d);setTimeout(()=>d.remove(),7000)}
+function welcome(){const u=unread().length;if(u)toast('🔔 You have '+u+' new notification'+(u>1?'s':''))}
+if(typeof addEventListener=='function')addEventListener('storage',e=>{if(e.key!='nurseapp'||!S.user)return;const b=unread().length;load();const u=unread();
+ if(u.length>b){toast('🔔 '+u[u.length-1].text);try{if(Notification.permission=='granted')new Notification('NMS',{body:u[u.length-1].text})}catch(x){}}
+ const a=document.activeElement;if(!document.querySelector('#modal')&&!(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)))R()});
+async function saveFile(name,data){try{const d=window.claude&&await claude.use('downloads');if(!d)return alert('Download is not available in this view');await d.save({filename:name,data})}catch(e){if(!e||e.code!='declined')alert('Could not save: '+((e&&e.message)||e))}}
+function xls(name,head,rows){const q=c=>'"'+String(c??'').replace(/"/g,'""')+'"';saveFile(name+'.csv','\ufeff'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n'))}
+function clock(){const e=$('#clk');if(e)e.textContent='📅 '+new Date().toLocaleString(L=='bn'?'bn-BD':'en-GB',{dateStyle:'full',timeStyle:'medium'})}
+setInterval(clock,1000);
+function R(){document.body.className=S.user?'':'lgin';$('#app').innerHTML=!S.user?loginV():mainV();clock();
+ $('#who').innerHTML=(S.user?bell():'')+(S.user?`${isAd()?'Admin':esc(me().name)+' <span class="tag cat">'+esc(me().cat)+'</span>'} <button onclick="S.user=null;R()">${t('Logout')}</button>`:'');
+ const len=db.news.reduce((s,n)=>s+n.text.length,0);
+ $('#tk').innerHTML=db.news.length?`<div class="tick np"><span style="animation-duration:${Math.max(15,len*.2)}s">${db.news.map(n=>md(n.text)).join(' &nbsp;◆&nbsp; ')}</span></div>`:'';
+ const f=db.footer;$('#ft').innerHTML=(f.h||f.a?`<div>${f.h?`<b>${esc(f.h)}</b>`:''}${f.a?' · '+esc(f.a):''}</div>`:'')+(f.l?`<div>${f.l.split('\n').filter(Boolean).map(x=>{const[a,u]=x.split('|');return u&&/^https?:/i.test(u.trim())?`<a href="${esc(u.trim())}" target="_blank" rel="noopener">${esc(a)}</a>`:esc(a)}).join(' | ')}</div>`:'')+`<div>© ${new Date().getFullYear()} Nasir, RN</div>`}
+/* ---------- login / register ---------- */
+function loginV(){const ad=S.lr=='admin';return `<div class="lgw"><div class="deco np"><span style="left:6%;top:10%">🩺</span><span style="right:8%;top:14%;animation-delay:1s">💉</span><span style="left:9%;bottom:14%;animation-delay:2s">🏥</span><span style="right:7%;bottom:18%;animation-delay:3s">💊</span><span style="left:46%;top:2%;animation-delay:.5s">❤️</span><span style="left:26%;bottom:5%;animation-delay:1.5s">🩹</span><span style="right:28%;bottom:4%;animation-delay:2.5s">🌡️</span></div>
+<div class="card lg"><div class="logo">🩺</div><h2 class="lgt" style="text-align:center;margin:2px 0;letter-spacing:4px">NMS</h2>
+<p class="mu" style="text-align:center;margin:0 0 4px;font-size:12px">NURSES MANAGEMENT SYSTEM · BY NASIR</p><p style="text-align:center;margin:0 0 12px;font-size:12px;color:var(--pr)">✚ Care · Compassion · Commitment ✚</p>
+<div class="row" style="justify-content:center"><button class="${ad?'':'on'}" onclick="S.lr='staff';R()">👩‍⚕️ Nurse</button><button class="${ad?'on':''}" onclick="S.lr='admin';R()">🛡 Admin</button></div>
+<label>${ad?t('Username'):'Phone No. (User ID)'}</label><input id="lu" inputmode="${ad?'text':'tel'}"><label>${t('Password')}</label><input id="lp" type="password" onkeydown="if(event.key=='Enter')login()">
+<button class="p" style="width:100%;margin-top:14px;padding:10px" onclick="login()">${t('Login')}</button>
+${ad?'':`<button style="width:100%;margin-top:8px" onclick="regForm()">📝 ${t('Register')} (Admin approval required)</button>`}
+<p class="mu" style="font-size:11px;text-align:center">Admin: admin / admin123 · Nurse default password: 1234</p></div></div>`}
+function login(){const u=$('#lu').value.trim(),p=$('#lp').value;
+ if(S.lr=='admin'){if(u==db.admin.u&&p==db.admin.p){S.user={role:'admin'};S.tab='nurses'}else return alert('Wrong login')}
+ else{const n=db.nurses.find(n=>n.phone==u&&(n.pass||'1234')==p);if(!n)return alert('Wrong login');if(n.st=='pend')return alert('Registration is pending admin approval');S.user={role:'staff',id:n.id};S.tab='profile';S.ward=''}R();try{Notification.requestPermission()}catch(e){}welcome()}
+function modal(h){const m=document.createElement('div');m.className='ov';m.id='modal';m.innerHTML=`<div class="card">${h}</div>`;document.body.appendChild(m)}
+function basicHtml(n,p){return BASE.map(([k,l,tp])=>`<div><label>${t(l)}</label><input id="${p}${k}" type="${tp||'text'}" value="${esc(n[k])}"></div>`).join('')+
+ `<div><label>${t('Category')} *</label><select id="${p}cat">${CATS.map(c=>`<option ${n.cat==c?'selected':''}>${c}</option>`).join('')}</select></div>
+ <div><label>${t('Ward')}</label><select id="${p}ward"><option value="">--</option>${db.wards.map(w=>`<option ${n.ward==w?'selected':''}>${esc(w)}</option>`).join('')}</select></div>`+
+ (p=='pe_'?'':`<div><label>${t('Password')}</label><input id="${p}pass" value="${esc(n.pass||'1234')}"></div>`)+
+ db.fields.filter(f=>!f.sec||f.sec=='Basic'||!db.secs.includes(f.sec)).map(f=>`<div><label>${esc(f.label)}</label><input id="${p}x_${f.id}" value="${esc((n.x||{})[f.id])}"></div>`).join('')}
+function formHtml(n,p){const S2=['Basic',...db.secs];return `<div class="row">${S2.map((s,i)=>`<button type="button" class="${i?'':'on'}" onclick="fTab(this,${i})">${esc(s)}</button>`).join('')}</div>`+
+ S2.map((s,i)=>`<div class="fs g" data-i="${i}" style="display:${i?'none':'grid'}">${i?db.fields.filter(f=>f.sec==s).map(f=>`<div><label>${esc(f.label)}</label><input id="${p}x_${f.id}" value="${esc((n.x||{})[f.id])}"></div>`).join(''):basicHtml(n,p)}</div>`).join('')}
+function fTab(b,i){const r=b.parentNode;r.querySelectorAll('button').forEach((x,j)=>x.className=j==i?'on':'');r.parentNode.querySelectorAll('.fs').forEach(d=>d.style.display=d.dataset.i==i?'grid':'none')}
+function readForm(p){const o={x:{}};BASE.forEach(([k])=>o[k]=$('#'+p+k).value.trim());o.cat=$('#'+p+'cat').value;o.ward=$('#'+p+'ward').value;db.fields.forEach(f=>o.x[f.id]=$('#'+p+'x_'+f.id).value);const pw=$('#'+p+'pass');if(pw)o.pass=pw.value||'1234';
+ if(!o.name||!o.phone||!o.hris){alert('Name, Phone No. and HRIS ID are required');return null}return o}
+const dup=(ph,id)=>db.nurses.some(n=>n.phone==ph&&n.id!=id);
+const btns=(ok,extra='')=>`<div class="row" style="margin-top:12px"><button class="p" onclick="${ok}">${t('Save')}</button><button onclick="$('#modal').remove()">${t('Cancel')}</button></div>`;
+function regForm(){modal(`<h3>${t('Register')}</h3><p class="mu">After you submit, you can log in once the admin approves your registration.</p>${formHtml({x:{}},'r_')}${btns('reg()')}`)}
+function reg(){const o=readForm('r_');if(!o)return;if(dup(o.phone))return alert('This phone number already exists');o.id=uid();o.st='pend';db.nurses.push(o);save();$('#modal').remove();alert('Submitted! Waiting for admin approval.')}
+/* ---------- main ---------- */
+function tabs(l){return `<nav class="np">${l.map(([k,x])=>`<button class="${S.tab==k?'on':''}" onclick="S.tab='${k}';R()">${x}</button>`).join('')}</nav>`}
+function apprItems(){const r=rk(),o={reg:[],pu:[],lv:[],rq:[],tr:[]};
+ if(r==9){o.reg=db.nurses.filter(n=>n.st=='pend');o.pu=db.nurses.filter(n=>n.pend)}
+ o.lv=db.leaves.filter(l=>NEED[l.stage]&&(r==9||r>2||NU(l.nurse).ward==me().ward)&&(r==9||l.nurse!=S.user.id));
+ o.rq=db.rq.filter(q=>q.type=='duty'&&NEED[q.stage]&&(r==9||r>2||NU(q.nurse).ward==me().ward)&&(r==9||q.nurse!=S.user.id));
+ o.tr=db.rq.filter(q=>q.type=='tr'&&canAct(q.stage,NU(q.nurse)));return o}
+function mainV(){const r=rk(),a=r==9,A=apprItems(),ac=A.reg.length+A.pu.length+A.lv.filter(l=>canAct(l.stage,NU(l.nurse))).length+A.rq.filter(q=>canAct(q.stage,NU(q.nurse))).length+A.tr.length,pc=db.complaints.filter(c=>canHandle(c)).length,T=[];
+ if(!a)T.push(['profile','👤 '+t('My Profile')]);if(r>=2)T.push(['nurses','👩‍⚕️ '+t('Nurses')],['appr','✅ '+t('Approvals')+(ac?` (${ac})`:'')]);
+ T.push(['roster','📅 '+t('Duty Roster')],['att','🕒 '+t('Attendance')],['leave','🏖 '+t('Leave')],['acr','📋 ACR'],['comp','📣 '+t('Complaints')+(pc?` (${pc})`:'')]);
+ if(a)T.push(['wards','🏥 '+t('Wards')],['news','📢 '+t('News Ticker')],['fields','🧩 '+t('Extra Fields')],['set','⚙ '+t('Settings')]);
+ if(!T.some(x=>x[0]==S.tab))S.tab=T[0][0];
+ return tabs(T)+({profile:prof,nurses,appr:apprV,roster,att:attV,leave:leaveV,acr:acrV,comp,wards,news:newsV,fields,set})[S.tab]()}
+const wsel=all=>`<select onchange="S.ward=this.value;R()">${all?`<option value="">${t('All Wards')}</option>`:''}${db.wards.map(w=>`<option ${S.ward==w?'selected':''}>${esc(w)}</option>`).join('')}</select>`;
+/* ---------- profile ---------- */
+function ctrl(n){const r=RK[n.cat]||1,f=c=>db.nurses.filter(x=>x.cat==c&&x.st!='pend'),o=[];
+ if(r==1)f('Nurse Incharge').filter(x=>x.ward==n.ward).forEach(x=>o.push(['Nurse Incharge',x]));
+ if(r<=2)f('Nursing Supervisor').forEach(x=>o.push(['Nursing Supervisor',x]));
+ if(r<=3)f('Deputy Nursing Superintendent').forEach(x=>o.push(['Deputy Nursing Superintendent',x]));
+ if(r<=4)f('Nursing Superintendent').forEach(x=>o.push(['Nursing Superintendent (Superior)',x]));
+ return o.map(([c,x])=>`<p style="margin:4px 0"><span class="tag">${c}</span> ${esc(x.name)} <span class="mu">${esc(x.phone)}</span></p>`).join('')||'<p class="mu">—</p>'}
+function prof(){const n=me();return `<div class="card"><h3>👤 ${esc(n.name)} <span class="tag cat">${esc(n.cat)}</span></h3><div class="g">${[...BASE.map(b=>[t(b[1]),n[b[0]]]),[t('Ward'),n.ward],...db.fields.map(f=>[f.label,(n.x||{})[f.id]])].map(([l,v])=>`<div><label>${esc(l)}</label><b>${esc(v)||'—'}</b></div>`).join('')}</div>
+ ${n.pend?'<p class="mu">⏳ Profile update waiting for admin approval</p>':''}<button class="p" style="margin-top:10px" onclick="puForm()">✏ Request profile update</button></div>
+ <div class="card"><h3>Controlling Officers</h3>${ctrl(n)}</div>
+ <div class="card"><h3>${t('Password')}</h3><div class="row"><input id="mpw" placeholder="New password" style="max-width:240px"><button onclick="if($('#mpw').value){me().pass=$('#mpw').value;save();alert('Saved')}">${t('Save')}</button></div></div>`}
+function puForm(){modal(`<h3>Profile update request</h3><p class="mu">Changes take effect after admin approval.</p>${formHtml(me(),'pe_')}${btns('puSave()')}`)}
+function puSave(){const o=readForm('pe_');if(!o)return;if(dup(o.phone,S.user.id))return alert('Phone already used');me().pend=o;save();$('#modal').remove();R()}
+/* ---------- nurses ---------- */
+function nFilt(){const q=S.q.toLowerCase(),w=rk()==2?me().ward:S.ward;return db.nurses.filter(n=>n.st!='pend'&&(!w||n.ward==w)&&(!q||(n.name+n.phone+n.hris+n.reg).toLowerCase().includes(q)))}
+const NC=()=>[...BASE.map(b=>[b[0],b[1].replace(/ \*| \(Login ID\)/g,'')]),['cat','Category'],['ward','Ward'],...db.fields.map(f=>[f.id,f.label])];
+function nurses(){const L2=nFilt(),cols=NC(),r=rk();
+ return `<div class="card"><div class="row np">${r==9?`<button class="p" onclick="nForm()">+ ${t('Add')}</button>`:''}${r==2?'':wsel(1)}
+ <input placeholder="${t('Search')}" value="${esc(S.q)}" onchange="S.q=this.value;R()" style="max-width:200px"><button onclick="print()">🖨 ${t('Print')}</button><button onclick="xls('nurses',NC().map(c=>t(c[1])),nFilt().map(n=>NC().map(c=>getv(n,c[0]))))">📊 ${t('Export Excel')}</button></div>
+ <p class="mu">${t('Total')}: ${L2.length}</p><div class="tw"><table><tr><th>#</th>${cols.map(c=>`<th>${esc(t(c[1]))}</th>`).join('')}<th class="np"></th></tr>
+ ${L2.map((n,i)=>`<tr><td>${i+1}</td>${cols.map(c=>`<td>${esc(getv(n,c[0]))}</td>`).join('')}<td class="np">${r==9?`<button onclick="nForm('${n.id}')">${t('Edit')}</button> <button class="d" onclick="nDel('${n.id}')">${t('Delete')}</button>`:''}${r==3&&(RK[n.cat]||1)<3?`<button onclick="trReq('${n.id}')">Ward change</button>`:''}</td></tr>`).join('')}</table></div></div>`}
+function nForm(id){const n=db.nurses.find(x=>x.id==id)||{x:{}};modal(`<h3>${id?t('Edit'):t('Add')}</h3>${formHtml(n,'e_')}${btns(`nSave('${id||''}')`)}`)}
+function nSave(id){const o=readForm('e_');if(!o)return;if(dup(o.phone,id))return alert('This phone number already exists');
+ if(id)Object.assign(db.nurses.find(n=>n.id==id),o);else{o.id=uid();o.st='ok';db.nurses.push(o)}save();$('#modal').remove();R()}
+function nDel(id){if(!confirm('Delete?'))return;db.nurses=db.nurses.filter(n=>n.id!=id);db.leaves=db.leaves.filter(l=>l.nurse!=id);Object.keys(db.roster).forEach(k=>db.roster[k]=db.roster[k].filter(x=>x!=id));save();R()}
+function trReq(id){const n=NU(id),w=prompt('New ward for '+n.name+':\n'+db.wards.join(', '));if(!w||!db.wards.includes(w)||w==n.ward)return;db.rq.push({id:uid(),type:'tr',nurse:id,to:w,stage:init('tr',rk())});save();alert('Sent for DNS / Nursing Superintendent approval');R()}
+/* ---------- approvals ---------- */
+function apprV(){const o=apprItems(),E=(h,l)=>l.length?`<div class="card"><h3>${h} (${l.length})</h3>${l.join('')}</div>`:'';
+ const ab=(f,id)=>`<button class="p" onclick="${f}('${id}',1)">${t('Approve')}</button> <button class="d" onclick="${f}('${id}',0)">${t('Reject')}</button>`;
+ const h=E('📝 Registrations',o.reg.map(n=>`<div class="row"><b>${esc(n.name)}</b><span class="mu">${esc(n.phone)} · HRIS ${esc(n.hris)} · ${t('Ward')}: ${esc(n.ward)||'—'}</span><select id="rc_${n.id}">${CATS.map(c=>`<option ${n.cat==c?'selected':''}>${c}</option>`).join('')}</select>${ab('regAct',n.id)}</div>`))+
+ E('✏ Profile updates',o.pu.map(n=>`<div class="row"><b>${esc(n.name)}</b><span class="mu">→ ${esc(n.pend.name)}, ${esc(n.pend.phone)}, ${esc(n.pend.cat)}, ${esc(n.pend.ward)}</span>${ab('puAct',n.id)}</div>`))+
+ E('🏖 Leave requests (all pending — only the current approver can act)',o.lv.map(l=>`<div class="row"><b>${esc(nm(l.nurse))}</b><span class="mu">${esc(NU(l.nurse).ward)}</span><span class="tag">${esc(l.type)}</span>${l.from} → ${l.to} (${dd(l.from,l.to)}d)<span class="mu">${esc(l.reason)}</span><small>${stg(l)}</small>${canAct(l.stage,NU(l.nurse))?ab('lAct',l.id):'<button disabled>'+t('Approve')+'</button> <button disabled>'+t('Reject')+'</button> <small class="mu">⏳ waiting for earlier approval</small>'} <button onclick="lEd('${l.id}')">${t('Edit')}</button></div>`))+
+ E('📅 Duty roster requests (change M/E/N before approving if needed)',o.rq.map(q=>{const ok=canAct(q.stage,NU(q.nurse));return `<div class="row"><b>${esc(nm(q.nurse))}</b>${q.date} · ${esc(q.ward)} · ${ok?`<select onchange="qShift('${q.id}',this.value)">${Object.keys(SH).map(c=>`<option value="${c}" ${q.shift==c?'selected':''}>${SL(c)}</option>`).join('')}</select>`:`<b>${SL(q.shift)}</b>`}<small>${STL[q.stage]}</small>${ok?ab('rAct',q.id):'<button disabled>'+t('Approve')+'</button> <button disabled>'+t('Reject')+'</button> <small class="mu">⏳ waiting for earlier approval</small>'}</div>`}))+
+ E('🔁 Ward change requests',o.tr.map(q=>`<div class="row"><b>${esc(nm(q.nurse))}</b>${esc(NU(q.nurse).ward)} → <b>${esc(q.to)}</b>${ab('rAct',q.id)}</div>`));
+ return h||'<div class="card mu">Nothing pending ✔</div>'}
+function regAct(id,ok){const n=NU(id);if(ok){n.st='ok';n.cat=$('#rc_'+id).value}else db.nurses=db.nurses.filter(x=>x.id!=id);save();R()}
+function puAct(id,ok){const n=NU(id);if(ok){const p=n.pend;if(dup(p.phone,id))return alert('Phone already used');p.x=Object.assign(n.x||{},p.x);Object.assign(n,p)}delete n.pend;save();R()}
+function lAct(id,ok){const l=db.leaves.find(x=>x.id==id);l.stage=ok?nxt('leave',l.stage,rk()):'REJ';notify(`Leave ${l.stage=='REJ'?'REJECTED':l.stage=='OK'?'APPROVED (final)':'approved, now '+STL[l.stage]}: ${nm(l.nurse)} — ${l.type} — ${l.from} to ${l.to} by ${actor()}`,'leave',{ward:NU(l.nurse).ward,ids:[l.nurse]});save();R()}
+function qShift(id,v){const q=db.rq.find(x=>x.id==id);q.shift=v;notify(`Duty changed before approval: ${nm(q.nurse)} — ${q.date} — ${SL(v)} (${q.ward}) by ${actor()}`,'duty',{ward:q.ward,ids:[q.nurse]});save();R()}
+function rAct(id,ok){const q=db.rq.find(x=>x.id==id);if(!ok)q.stage='REJ';else{q.stage=nxt(q.type,q.stage,rk());
+ if(q.stage=='OK'){if(q.type=='duty'){Object.keys(db.roster).forEach(k=>{if(k.startsWith(q.date+'|'))db.roster[k]=db.roster[k].filter(x=>x!=q.nurse)});const k=q.date+'|'+q.ward+'|'+q.shift;(db.roster[k]=db.roster[k]||[]).push(q.nurse)}else NU(q.nurse).ward=q.to}}notify(q.type=='duty'?`Duty ${q.stage=='REJ'?'REJECTED':q.stage=='OK'?'APPROVED (final)':'approved by Nurse Incharge, awaiting Supervisor'}: ${nm(q.nurse)} — ${q.date} — ${SL(q.shift)} (${q.ward}) by ${actor()}`:`Ward change ${q.stage=='REJ'?'REJECTED':'APPROVED'}: ${nm(q.nurse)} → ${q.to} by ${actor()}`,'duty',{ward:q.ward||q.to,ids:[q.nurse]});save();R()}
+/* ---------- wards ---------- */
+function wards(){return `<div class="card"><h3>${t('Wards')}</h3><div class="row"><input id="nw" style="max-width:260px"><button class="p" onclick="wAdd()">${t('Add')}</button></div>
+ ${db.wards.map((w,i)=>`<div class="row"><b style="min-width:150px">${esc(w)}</b><span class="mu">${db.nurses.filter(n=>n.ward==w).length}</span><button onclick="wRen(${i})">${t('Rename')}</button><button class="d" onclick="wDel(${i})">${t('Delete')}</button></div>`).join('')}</div>`}
+function wAdd(){const v=$('#nw').value.trim();if(v&&!db.wards.includes(v)){db.wards.push(v);save();R()}}
+function wRen(i){const v=prompt('Name',db.wards[i]);if(!v)return;db.nurses.forEach(n=>{if(n.ward==db.wards[i])n.ward=v});
+ Object.keys(db.roster).forEach(k=>{const p=k.split('|');if(p[1]==db.wards[i]){db.roster[p[0]+'|'+v+'|'+p[2]]=db.roster[k];delete db.roster[k]}});db.wards[i]=v;save();R()}
+function wDel(i){if(confirm('Delete ward?')){db.nurses.forEach(n=>{if(n.ward==db.wards[i])n.ward=''});db.wards.splice(i,1);save();R()}}
+/* ---------- roster ---------- */
+const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],dow=d=>new Date(d+'T00:00:00Z').getUTCDay(),hday=d=>db.hol.find(h=>h.date==d);
+function holRow(m){const L2=db.hol.filter(h=>h.date.slice(0,7)==m);return `<div class="np" style="margin-bottom:8px">${isAd()?`<div class="row"><input type="date" id="rhd" value="${m}-01" style="max-width:160px"><input id="rhn" placeholder="Holiday name" style="max-width:200px"><button class="p" onclick="holAdd2()">+ Public holiday</button></div>`:''}<small class="mu">Govt holidays this month (official calendar)${L2.length?':':': none'} </small>${L2.map(h=>`<span class="hl ho">${h.date.slice(8)} ${esc(h.name||'Holiday')}${isAd()?`<b style="cursor:pointer;color:#b91c1c;margin-left:4px" onclick="holDel('${h.date}')">×</b>`:''}</span>`).join('')}</div>`}
+function holAdd2(){const d=$('#rhd').value;if(!d)return;if(db.hol.some(h=>h.date==d))return alert('Already a holiday');const nmx=$('#rhn').value.trim();db.hol.push({date:d,name:nmx});db.hol.sort((a,b)=>a.date.localeCompare(b.date));notify('Public holiday added: '+d+(nmx?' — '+nmx:''),'news',{all:true});save();R()}
+function holDel(d){db.hol=db.hol.filter(h=>h.date!=d);save();R()}
+function holBulk(){let c=0;$('#hb').value.split('\n').forEach(l=>{const [d,n]=l.split('|');if(/^\d{4}-\d\d-\d\d$/.test((d||'').trim())&&!db.hol.some(h=>h.date==d.trim())){db.hol.push({date:d.trim(),name:(n||'').trim()});c++}});db.hol.sort((a,b)=>a.date.localeCompare(b.date));save();alert(c+' holiday(s) added');R()}
+function holReload(){HOL26.forEach(x=>{const [d,n]=x.split('|');if(!db.hol.some(h=>h.date==d))db.hol.push({date:d,name:n})});db.hol.sort((a,b)=>a.date.localeCompare(b.date));save();R()}
+function rInfo(){const w=S.ward||(!isAd()&&me().ward)||db.wards[0]||'',m=S.rm,Y=+m.slice(0,4),M=+m.slice(5,7),n=new Date(Y,M,0).getDate();
+ return {w,m,Y,n,ds:[...Array(n)].map((_,i)=>m+'-'+String(i+1).padStart(2,'0')),pool:db.nurses.filter(x=>x.ward==w&&x.st!='pend').sort((a,b)=>(b.cat=='Nurse Incharge')-(a.cat=='Nurse Incharge')),mn:new Date(Y,M-1,1).toLocaleString('en',{month:'long'})}}
+function roster(){const r=rk(),{w,m,Y,n,ds,pool,mn}=rInfo(),canEd=id=>r>=3||(r==2&&me().ward==w)||(r==1&&id==S.user.id),hc=d=>{const h=hday(d),f=dow(d)==5;return {c:h?'ho':f?'fr':'',t:h?((h.name||'Public holiday')+(f?' (also Friday)':'')):f?'Friday — weekly holiday':''}};
+ const hint=r==1?'Pick M / E / N in your own row to request a duty. Needs Nurse Incharge approval, then Nursing Supervisor approval.':r==2?'You can enter / change duty for your ward. Your entry counts as duty at once and then needs Nursing Supervisor approval.':r==3?'Your entries are final. Approve pending requests from the Approvals tab (they can also be edited here before approving).':'';
+ return `<div class="card"><div class="row np"><select onchange="S.ward=this.value;R()">${db.wards.map(x=>`<option ${x==w?'selected':''}>${esc(x)}</option>`).join('')}</select><input type="month" value="${m}" onchange="S.rm=this.value||S.rm;R()" style="max-width:170px"><button onclick="print()">🖨 ${t('Print')}</button><button onclick="rX()">📊 ${t('Export Excel')}</button></div>
+ <p class="mu np" style="font-size:12px">${hint}</p>
+ <div class="row np" style="font-size:12px"><span class="chip tM">M</span>Morning 8am–2pm <span class="chip tE">E</span>Evening 2pm–8pm <span class="chip tN">N</span>Night 8pm–8am <span class="chip tD">D/O</span>Day off <span class="chip red">CL…</span>Leave <span class="chip" style="border:2px dashed #d97706">dashed</span>awaiting approval (⏳ = awaiting Nurse Incharge) <span class="hl fr">Fri</span>Weekly holiday <span class="hl ho">Date</span>Public holiday (hover a date for its name)</div>
+ ${holRow(m)}
+ <h4 style="margin:4px 0">Ward: ${esc(w)}</h4><div class="tw"><table class="rt"><tr><th colspan="${n+2}" style="color:red;font-size:16px;font-weight:600">${mn} ${Y}</th></tr><tr><th>SL</th><th>Name</th>${ds.map(d=>`<th class="${hc(d).c}" title="${esc(hc(d).t)}">${d.slice(8)}</th>`).join('')}</tr><tr><th></th><th>Day</th>${ds.map(d=>`<th class="${hc(d).c}" title="${esc(hc(d).t)}"><span class="dn">${DN[dow(d)]}</span></th>`).join('')}</tr>
+ ${pool.map((x,i)=>`<tr class="${x.cat=='Nurse Incharge'?'inc':''}"><td>${String(i+1).padStart(2,'0')}</td><td class="nm">${esc(x.name)}${x.cat=='Nurse Incharge'?' <small>★ In-charge</small>':''}<br><small class="mu" title="D/O used / allowed this month (Fridays + govt holidays)">D/O ${doUsedM(x.id,m)}/${holN(m)}</small></td>${ds.map(d=>{const lv=onLeave(x.id,d);if(lv)return `<td class="lv" title="${esc(lv.type)}">${esc(lv.type)}</td>`;
+ const {s,q}=shiftOf(x.id,d,w),ed=q?(isAd()||canAct(q.stage,x)||(r==2&&me().ward==w)):(canEd(x.id)&&(r>=2||!s));
+ return `<td class="${s?'t'+s:(ed?'ed0 ':'')+hc(d).c}${q?' pq':''}" ${q?`title="${q.stage=='NI'?'Waiting for Nurse Incharge approval':'Counted as duty - waiting for Nursing Supervisor approval'}"`:hc(d).t?`title="${esc(hc(d).t)}"`:''}>${ed?`<select onchange="rSet('${w}','${d}','${x.id}',this.value)"><option value="">+</option>${Object.keys(SH).map(c=>`<option value="${c}" ${s==c?'selected':''}>${SL(c)}</option>`).join('')}</select>`:(q&&q.stage=='NI'?'⏳':'')+SL(s)}</td>`}).join('')}</tr>`).join('')}</table></div></div>`}
+function rX(){const {w,m,ds,pool}=rInfo();xls('roster-'+w+'-'+m,['SL','Name',...ds.map(d=>d.slice(8)+' '+DN[dow(d)]+(hday(d)?' (H)':''))],pool.map((x,i)=>[i+1,x.name,...ds.map(d=>{const lv=onLeave(x.id,d);return lv?lv.type:SL(shiftOf(x.id,d,w).s)})]))}
+function rSet(w,d,id,s){const r=rk(),pq=db.rq.find(q=>q.type=='duty'&&q.nurse==id&&q.date==d&&q.ward==w&&NEED[q.stage]),
+ other=Object.keys(db.roster).some(k=>k.startsWith(d+'|')&&!k.startsWith(d+'|'+w+'|')&&db.roster[k].includes(id))||db.rq.some(q=>q.type=='duty'&&q.nurse==id&&q.date==d&&NEED[q.stage]&&q.ward!=w),
+ clear=()=>Object.keys(db.roster).forEach(k=>{if(k.startsWith(d+'|'))db.roster[k]=db.roster[k].filter(x=>x!=id)}),
+ mk=st=>db.rq.push({id:uid(),type:'duty',nurse:id,date:d,ward:w,shift:s,stage:st});
+ if(s&&other)return(alert('This nurse already has a duty on '+d+' in another ward (one shift per day)'),R());
+ if(s=='D'&&!isAd()&&doUsedM(id,d.slice(0,7),d)>=holN(d.slice(0,7)))return(alert('D/O limit reached for '+d.slice(0,7)+': only '+holN(d.slice(0,7))+' off-days (Fridays + govt holidays)'),R());
+ if(pq){if(s)pq.shift=s;else db.rq=db.rq.filter(q=>q!=pq)}
+ else if(r>=3){clear();if(s)(db.roster[d+'|'+w+'|'+s]=db.roster[d+'|'+w+'|'+s]||[]).push(id)}
+ else if(r==2){if(s)mk('SUP');else clear()}
+ else if(s)mk('NI');
+ notify(`Duty: ${nm(id)} — ${d} — ${s?SL(s):'removed'} (${w}) by ${actor()}${pq?' (changed before approval)':r==1?' (requested, awaiting Nurse Incharge)':r==2?' (awaiting Supervisor approval)':''}`,'duty',{ward:w,ids:[id]});save();R()}
+/* ---------- attendance ---------- */
+function monthRows(m,P){const n=new Date(m.slice(0,4),m.slice(5,7),0).getDate(),ds=[...Array(n)].map((_,i)=>m+'-'+String(i+1).padStart(2,'0'));
+ return {ds,rows:P.map(p=>({p,c:ds.map(d=>{const lv=onLeave(p.id,d);return lv?lv.type:shiftOf(p.id,d,p.ward).s=='D'?'D/O':(db.att[d+'|'+p.id]||'')})}))}}
+function attV(){const r=rk();if(r==1)return nAtt();const d=S.ad,w=r==2?me().ward:S.ward,P=db.nurses.filter(n=>n.st!='pend'&&(!w||n.ward==w));
+ return `<div class="card"><div class="row np">${r==2?`<b>${esc(w)}</b>`:wsel(1)}<input type="date" value="${d}" onchange="S.ad=this.value;R()" style="max-width:165px"><button class="p" onclick="attX()">📊 ${t('Export Excel')} (${t('Month')})</button></div>
+ <div class="tw"><table><tr><th>#</th><th>${t('Name')}</th><th>${t('Ward')}</th><th>${t('Shift')}</th><th>${t('Status')}</th><th>Ward arrival time(s)</th></tr>
+ ${P.map((n,i)=>{const lv=onLeave(n.id,d),sh=(x=>x?t(SH[x]):'')(shiftOf(n.id,d,n.ward).s),cur=db.att[d+'|'+n.id]||'',tm=db.atm[d+'|'+n.id]||[];
+ return `<tr><td>${i+1}</td><td>${esc(n.name)}</td><td>${esc(n.ward)}</td><td>${sh||'—'}</td><td>${lv?`<span class="chip red">${esc(lv.type)}</span>`:`<select onchange="aSet('${d}','${n.id}',this.value)"><option value="">—</option>${db.attTypes.map(a=>`<option value="${esc(a.c)}" ${cur==a.c?'selected':''}>${esc(a.c)} · ${esc(tn(a))}</option>`).join('')}</select>`}</td>
+ <td>${tm.map((x,j)=>`<span class="chip">${x}<b onclick="aTd('${d}','${n.id}',${j})">×</b></span>`).join('')}<input type="time" id="tm_${n.id}" style="width:120px"> <button onclick="aTm('${d}','${n.id}')">+ (${tm.length})</button></td></tr>`}).join('')}</table></div></div>`}
+function aSet(d,id,v){const k=d+'|'+id;if(v)db.att[k]=v;else delete db.att[k];save()}
+function aTm(d,id){const v=$('#tm_'+id).value;if(!v)return;(db.atm[d+'|'+id]=db.atm[d+'|'+id]||[]).push(v);save();R()}
+function aTd(d,id,j){db.atm[d+'|'+id].splice(j,1);save();R()}
+function attX(){const r=rk(),w=r==2?me().ward:S.ward,m=S.ad.slice(0,7),{ds,rows}=monthRows(m,db.nurses.filter(n=>n.st!='pend'&&(!w||n.ward==w))),codes=[...db.attTypes.map(a=>a.c),...db.leaveTypes.map(a=>a.c),'D/O'];
+ xls('attendance-'+m,['#',t('Name'),'HRIS',t('Ward'),...ds.map(d=>+d.slice(8)),...codes],rows.map((x,i)=>[i+1,x.p.name,x.p.hris,x.p.ward,...x.c,...codes.map(c=>x.c.filter(y=>y==c).length)]))}
+function nAtt(){const {ds,rows}=monthRows(S.am,[me()]),c=rows[0].c;
+ return `<div class="card"><h3>${t('Attendance')}</h3><input type="month" value="${S.am}" onchange="S.am=this.value||S.am;R()" style="max-width:180px"><div class="tw"><table><tr><th>${t('Date')}</th><th>${t('Status')}</th><th>Time</th></tr>${ds.map((d,i)=>`<tr><td>${d}</td><td>${c[i]?`<span class="tag">${esc(c[i])}</span>`:'—'}</td><td>${(db.atm[d+'|'+S.user.id]||[]).join(', ')||'—'}</td></tr>`).join('')}</table></div></div>`}
+/* ---------- leave ---------- */
+function lFilt(){const d=S.ld,r=rk(),w=r==2?me().ward:S.lw;return db.leaves.filter(l=>eff(l)&&(S.lm=='all'||(l.from<=d&&d<=l.to))&&(!w||NU(l.nurse).ward==w))}
+function leaveV(){const r=rk(),a=r==9,mo=today().slice(0,7),cand=r==1?[me()]:r==2?db.nurses.filter(n=>n.st!='pend'&&n.ward==me().ward):db.nurses.filter(n=>n.st!='pend'),tps=db.leaveTypes.filter(x=>r>=2||isNE(x.c));
+ let h=`<div class="card np"><h3>${t('Request Leave')}</h3><p class="mu" style="font-size:12px">${r==1?'You can apply for CL yourself. ':''}Flow: Nurse Incharge → Nursing Supervisor → DNS / Nursing Superintendent (final) · CL: ${db.clMax} days/year · D/O is now chosen in the Duty Roster</p>
+ <div class="g"><div><label>${t('Name')}</label><select id="lf_n">${cand.map(n=>`<option value="${n.id}">${esc(n.name)} (${esc(n.ward)}) — ${lsum(n.id,mo)}</option>`).join('')}</select></div>
+ <div><label>${t('Type')}</label><select id="lf_t">${tps.map(x=>`<option value="${esc(x.c)}">${esc(x.c)} · ${esc(tn(x))}</option>`).join('')}</select></div>
+ <div><label>${t('From')}</label><input type="date" id="lf_f" value="${today()}"></div><div><label>${t('To')}</label><input type="date" id="lf_e" value="${today()}"></div><div><label>${t('Reason')}</label><input id="lf_r"></div></div>
+ <button class="p" style="margin-top:10px" onclick="lReq()">${t('Submit')}</button></div>`;
+ if(!a){const mine=db.leaves.filter(l=>l.nurse==S.user.id).reverse();
+ h+=`<div class="card np"><h3>${t('Leave')}</h3><div class="row"><span class="chip">${lsum(S.user.id,mo)}</span>${db.leaveTypes.filter(x=>r>=2||isNE(x.c)).map(x=>`<span class="chip">${esc(x.c)}: ${mine.filter(l=>l.type==x.c&&l.stage=='OK').reduce((s,l)=>s+dd(l.from,l.to),0)} ${t('Days')}</span>`).join('')}</div><div class="tw"><table><tr><th>${t('Type')}</th><th>${t('From')}</th><th>${t('To')}</th><th>${t('Days')}</th><th>${t('Status')}</th></tr>${mine.map(l=>`<tr><td>${esc(l.type)}</td><td>${l.from}</td><td>${l.to}</td><td>${dd(l.from,l.to)}</td><td>${stg(l)}</td></tr>`).join('')}</table></div></div>`}
+ return h+(r>=2?leaveRep()+leaveAll()+(a?listEd('leaveTypes','Leave Types (add new leave)',1):''):'')}
+function lReq(){const o={id:uid(),nurse:$('#lf_n').value,type:$('#lf_t').value,from:$('#lf_f').value,to:$('#lf_e').value,reason:$('#lf_r').value,stage:init('leave',rk())};
+ if(!o.nurse||!o.from||!o.to||o.to<o.from)return alert('Check nurse / dates');const er=checkLeave(o.nurse,o.type,o.from,o.to);if(er)return alert(er);db.leaves.push(o);notify(`Leave ${o.stage=='OK'?'recorded':'requested'}: ${nm(o.nurse)} — ${o.type} — ${o.from} to ${o.to} by ${actor()}`,'leave',{ward:NU(o.nurse).ward,ids:[o.nurse]});save();alert(o.stage=='OK'?'Leave recorded':'Sent for approval');R()}
+function lEd(id){const l=db.leaves.find(x=>x.id==id),c=prompt('Type code ('+db.leaveTypes.map(x=>x.c).join(', ')+')',l.type);if(!c||!db.leaveTypes.some(x=>x.c==c))return;const f=prompt('From (YYYY-MM-DD)',l.from),e=prompt('To (YYYY-MM-DD)',l.to),re=/^\d{4}-\d\d-\d\d$/;
+ if(!f||!e||!re.test(f)||!re.test(e)||e<f)return alert('Invalid dates');const er=checkLeave(l.nurse,c,f,e,l.id);if(er)return alert(er);l.type=c;l.from=f;l.to=e;const rs=prompt('Reason',l.reason);if(rs!==null)l.reason=rs;notify(`Leave edited: ${nm(l.nurse)} — ${l.type} — ${l.from} to ${l.to} by ${actor()}`,'leave',{ward:NU(l.nurse).ward,ids:[l.nurse]});save();R()}
+function lDel(id){if(confirm('Delete this leave?')){const l=db.leaves.find(x=>x.id==id);if(l)notify(`Leave deleted: ${nm(l.nurse)} — ${l.type} — ${l.from} to ${l.to} by ${actor()}`,'leave',{ward:NU(l.nurse).ward,ids:[l.nurse]});db.leaves=db.leaves.filter(l=>l.id!=id);save();R()}}
+function leaveAll(){const r=rk(),L2=db.leaves.filter(l=>r!=2||NU(l.nurse).ward==me().ward).slice().reverse();
+ return `<div class="card np"><h3>Leave records & status</h3><div class="tw"><table><tr><th>${t('Name')}</th><th>${t('Type')}</th><th>${t('From')}</th><th>${t('To')}</th><th>${t('Days')}</th><th>${t('Status')}</th><th></th></tr>${L2.map(l=>`<tr><td>${esc(nm(l.nurse))}<br><small class="mu">${esc(NU(l.nurse).ward)}</small></td><td>${esc(l.type)}</td><td>${l.from}</td><td>${l.to}</td><td>${dd(l.from,l.to)}</td><td><small>${stg(l)}</small></td><td><button onclick="lEd('${l.id}')">${t('Edit')}</button>${isAd()?` <button class="d" onclick="lDel('${l.id}')">${t('Delete')}</button>`:''}</td></tr>`).join('')}</table></div></div>`}
+function leaveRep(){const d=S.ld,r=rk(),base=lFilt(),F=base.filter(l=>!S.lt||l.type==S.lt),ws=[...db.wards,''],mo=(S.lm=='on'?d:today()).slice(0,7);
+ const tbl=L2=>`<div class="tw"><table><tr><th>#</th><th>${t('Name')}</th><th>HRIS ID</th><th>${t('Category')}</th><th>${t('Ward')}</th><th>${t('Type')}</th><th>${t('From')}</th><th>${t('To')}</th><th>${t('Days')}</th><th>${t('Reason')}</th><th class="np"></th></tr>
+ ${L2.map((l,i)=>{const n=NU(l.nurse);return `<tr><td>${i+1}</td><td>${esc(n.name)}<br><small class="mu">${lsum(n.id,mo)}</small></td><td>${esc(n.hris)}</td><td>${esc(n.cat)}</td><td>${esc(n.ward)}</td><td><span class="tag">${esc(l.type)}</span> ${esc(tn(ty(l.type)))}</td><td>${l.from}</td><td>${l.to}</td><td>${dd(l.from,l.to)}</td><td>${esc(l.reason)}</td><td class="np"><button onclick="lEd('${l.id}')">${t('Edit')}</button>${isAd()?` <button class="d" onclick="lDel('${l.id}')">${t('Delete')}</button>`:''}</td></tr>`}).join('')}</table></div>`;
+ return `<div class="card"><h3>${t('Nurses on Leave')} ${S.lm=='on'?'— '+d:''}</h3><div class="row np"><select onchange="S.lm=this.value;R()"><option value="on" ${S.lm=='on'?'selected':''}>On leave on date</option><option value="all" ${S.lm=='all'?'selected':''}>All records</option></select>
+ ${S.lm=='on'?`<input type="date" value="${d}" onchange="S.ld=this.value;R()" style="max-width:165px">`:''}
+ ${r==2?'':`<select onchange="S.lw=this.value;R()"><option value="">${t('All Wards')}</option>${db.wards.map(w=>`<option ${S.lw==w?'selected':''}>${esc(w)}</option>`).join('')}</select>`}
+ <select onchange="S.lg=this.value;R()"><option value="">General list (all ward)</option><option value="w" ${S.lg?'selected':''}>Ward-wise list</option></select>
+ <button onclick="print()">🖨 ${t('Print')}</button><button onclick="xls('leave-report',['#',t('Name'),'HRIS ID',t('Category'),t('Ward'),t('Type'),t('From'),t('To'),t('Days'),t('Reason'),'CL left'],F.map((l,i)=>{const n=NU(l.nurse);return [i+1,n.name,n.hris,n.cat,n.ward,l.type,l.from,l.to,dd(l.from,l.to),l.reason,clLeft(n.id,'${mo.slice(0,4)}')]}))">📊 ${t('Export Excel')}</button></div>
+ <div class="row np"><button class="${S.lt?'':'on'}" onclick="S.lt='';R()">${t('All')} (${base.length})</button>${db.leaveTypes.map(x=>`<button class="${S.lt==x.c?'on':''}" onclick="S.lt='${esc(x.c)}';R()">${esc(x.c)} (${base.filter(l=>l.type==x.c).length})</button>`).join('')}</div>
+ <p class="mu">${ws.filter(w=>F.some(l=>(NU(l.nurse).ward||'')==w)).map(w=>`<b>${esc(w||'—')}</b>: ${F.filter(l=>(NU(l.nurse).ward||'')==w).length}`).join(' · ')||'—'}</p>
+ ${S.lg?ws.map(w=>{const x=F.filter(l=>(NU(l.nurse).ward||'')==w);return x.length?`<h4 style="margin:12px 0 4px">Ward: ${esc(w||'—')} (${x.length})</h4>`+tbl(x):''}).join(''):tbl([...F].sort((a,b)=>(NU(a.nurse).ward||'').localeCompare(NU(b.nurse).ward||'')))}</div>`}
+function listEd(k,title,flag){return `<div class="card np"><h3>${title}</h3>${db[k].map((x,i)=>`<div class="row"><span class="tag">${esc(x.c)}</span><b style="min-width:160px">${esc(tn(x))}</b>${flag?`<label style="margin:0"><input type="checkbox" style="width:auto" ${x.ne?'checked':''} onchange="db.${k}[${i}].ne=this.checked?1:0;save()"> Nurse self-entry (like CL)</label>`:''}<button onclick="leEd('${k}',${i})">${t('Edit')}</button><button class="d" onclick="leDel('${k}',${i})">${t('Remove')}</button></div>`).join('')}
+ <div class="row"><input id="${k}_c" placeholder="Code" style="max-width:90px"><input id="${k}_n" placeholder="Name (English)" style="max-width:190px">${flag?`<label style="margin:0"><input type="checkbox" id="${k}_ne" style="width:auto"> Nurse self-entry</label>`:''}<button class="p" onclick="leAdd('${k}')">${t('Add')}</button></div></div>`}
+function leAdd(k){const c=$('#'+k+'_c').value.trim(),n=$('#'+k+'_n').value.trim();if(!c||!n||db[k].some(x=>x.c==c))return alert('Code & name required (unique code)');const o={c,n,bn:''};if($('#'+k+'_ne'))o.ne=$('#'+k+'_ne').checked?1:0;db[k].push(o);save();R()}
+function leEd(k,i){const x=db[k][i],c=prompt('Code',x.c);if(!c)return;x.c=c;x.n=prompt('Name',x.n)||x.n;save();R()}
+function leDel(k,i){if(confirm('Remove?')){db[k].splice(i,1);save();R()}}
+/* ---------- ACR ---------- */
+function acrV(){const r=rk(),Y=new Date().getFullYear(),yrs=[...Array(8)].map((_,i)=>String(Y-i)),lab=v=>v=='Y'?'<b style="color:var(--pr)">Yes ✔</b>':v=='N'?'<b style="color:var(--dg)">No ✘</b>':'—';
+ if(r==1)return `<div class="card"><h3>ACR</h3><table style="min-width:0"><tr><th>Year</th><th>ACR submitted?</th></tr>${yrs.map(y=>`<tr><td>${y}</td><td>${lab(db.acr[y+'|'+S.user.id])}</td></tr>`).join('')}</table></div>`;
+ const w=r==2?me().ward:S.ward,P=db.nurses.filter(n=>n.st!='pend'&&(!w||n.ward==w));
+ return `<div class="card"><h3>ACR</h3><div class="row np"><select onchange="S.ay=this.value;R()">${yrs.map(y=>`<option ${S.ay==y?'selected':''}>${y}</option>`).join('')}</select>${r==2?'':wsel(1)}<button onclick="xls('ACR-${S.ay}',['#',t('Name'),'HRIS',t('Ward'),'ACR ${S.ay}'],nFilt().map((n,i)=>[i+1,n.name,n.hris,n.ward,{Y:'Yes',N:'No'}[db.acr['${S.ay}|'+n.id]]||'—']))">📊 ${t('Export Excel')}</button></div>
+ ${r<3?'<p class="mu">View only. Nursing Supervisor / DNS / Nursing Superintendent update ACR.</p>':''}<div class="tw"><table><tr><th>#</th><th>${t('Name')}</th><th>HRIS</th><th>${t('Ward')}</th><th>ACR ${S.ay}</th></tr>
+ ${P.map((n,i)=>{const v=db.acr[S.ay+'|'+n.id]||'';return `<tr><td>${i+1}</td><td>${esc(n.name)}</td><td>${esc(n.hris)}</td><td>${esc(n.ward)}</td><td>${r>=3?`<select onchange="acrSet('${n.id}',this.value)"><option value="">—</option><option value="Y" ${v=='Y'?'selected':''}>Yes</option><option value="N" ${v=='N'?'selected':''}>No</option></select>`:lab(v)}</td></tr>`}).join('')}</table></div></div>`}
+function acrSet(id,v){const k=S.ay+'|'+id;if(v)db.acr[k]=v;else delete db.acr[k];save()}
+/* ---------- complaints ---------- */
+const LVN=['','','Nurse Incharge','Nursing Supervisor','Deputy Nursing Superintendent','Nursing Superintendent','Admin'];
+function cCard(c){const act=canHandle(c),ad=isAd(),
+ body=`<div class="row"><b>${esc(nm(c.by))}</b><span class="mu">${esc(NU(c.by).ward)} · ${c.date}</span><span class="tag">${c.status=='open'?'With: '+LVN[c.lvl]:'Closed'}</span></div><p style="white-space:pre-wrap"><b>${esc(c.subject)}</b><br>${esc(c.text)}</p>${c.log.map(x=>`<p class="mu" style="margin:3px 0">↳ <b>${esc(x.role)} ${esc(x.by)}</b> (${x.act}, ${x.date}): ${esc(x.text)}</p>`).join('')}`+
+ (act?`<textarea id="cr_${c.id}" rows="2" placeholder="Reply / action note"></textarea><div class="row" style="margin-top:6px">${c.lvl<5&&!ad?`<button class="p" onclick="cAct('${c.id}','f')">Reply &amp; forward ↑</button>`:''}<button onclick="cAct('${c.id}','c')">${c.lvl>=5||ad?'Final action / Close':'Dismiss (close)'}</button>${ad?`<button class="d" onclick="cDel('${c.id}')">${t('Delete')}</button>`:''}</div>`:ad?`<button class="d" onclick="cDel('${c.id}')">${t('Delete')}</button>`:'');
+ return c.status=='closed'?`<details class="card"><summary>✔ ${esc(c.subject)} — ${esc(nm(c.by))} <span class="mu">(closed)</span></summary>${body}</details>`:`<div class="card">${body}</div>`}
+function comp(){const a=isAd(),id=a?'':S.user.id,vis=db.complaints.filter(c=>a||c.by==id||canHandle(c)||c.log.some(x=>x.uid==id)).slice().reverse(),inbox=vis.filter(c=>c.by!=id&&canHandle(c)),rest=vis.filter(c=>!inbox.includes(c));
+ return (a?'':`<div class="card"><h3>${t('Complaint Box')}</h3><p class="mu" style="font-size:12px">Goes to your Controlling Officer, then upward; the Nursing Superintendent takes the final action.</p><label>${t('Subject')}</label><input id="cs"><label>${t('Details')}</label><textarea id="ct" rows="4"></textarea><button class="p" style="margin-top:10px" onclick="cSend()">${t('Submit')}</button></div>`)+
+ (inbox.length?`<h3>📥 Needs your action (${inbox.length})</h3>`+inbox.map(cCard).join(''):'')+`<h3>${t('Complaints')}</h3>`+(rest.map(cCard).join('')||'<p class="mu">—</p>')}
+function cSend(){const s=$('#cs').value.trim(),x=$('#ct').value.trim();if(!s||!x)return alert('Fill both');db.complaints.push({id:uid(),by:S.user.id,subject:s,text:x,date:today(),status:'open',lvl:Math.min(rk()+1,6),log:[]});save();R()}
+function cAct(id,m){const c=db.complaints.find(x=>x.id==id),v=$('#cr_'+id).value.trim();if(!v)return alert('Write a reply / note first');
+ c.log.push({uid:S.user.id,by:isAd()?'':me().name,role:isAd()?'Admin':me().cat,text:v,act:m=='f'?'Forwarded':'Closed',date:today()});if(m=='f')c.lvl=Math.min(c.lvl+1,6);else c.status='closed';save();R()}
+function cDel(id){if(confirm('Delete?')){db.complaints=db.complaints.filter(c=>c.id!=id);save();R()}}
+/* ---------- admin: news, fields, settings ---------- */
+function newsV(){return `<div class="card"><h3>📢 ${t('News Ticker')}</h3><p class="mu">Red scrolling text at the top. Wrap important parts like <b>**this**</b> to make them bold and underlined.</p>
+ <textarea id="nt" rows="2" placeholder="e.g. **Urgent:** Meeting tomorrow at 10 AM"></textarea><button class="p" style="margin-top:8px" onclick="newsAdd()">${t('Add')}</button></div>
+ ${db.news.map((n,i)=>`<div class="card"><div>${md(n.text)}</div><div class="row" style="margin-top:8px"><button onclick="nwEd(${i})">${t('Edit')}</button><button class="d" onclick="db.news.splice(${i},1);save();R()">${t('Delete')}</button></div></div>`).join('')}`}
+function newsAdd(){const v=$('#nt').value.trim();if(!v)return;db.news.push({id:uid(),text:v});notify('News: '+v.replace(/\*\*/g,''),'news',{all:true});save();R()}
+function nwEd(i){const v=prompt('Text',db.news[i].text);if(v){db.news[i].text=v;notify('News updated: '+v.replace(/\*\*/g,''),'news',{all:true});save();R()}}
+function fields(){const S2=['Basic',...db.secs];return `<div class="card"><h3>Form tabs (sections)</h3><p class="mu">Add a new tab to the nurse data-entry form, then create new fields inside that tab.</p>
+ <div class="row"><input id="ns" placeholder="New tab name" style="max-width:240px"><button class="p" onclick="secAdd()">${t('Add')}</button></div>
+ ${db.secs.map((s,i)=>`<div class="row"><span class="tag">${esc(s)}</span><button onclick="secRen(${i})">${t('Rename')}</button><button class="d" onclick="secDel(${i})">${t('Remove')}</button></div>`).join('')}</div>
+ <div class="card"><h3>${t('Extra Fields')}</h3><div class="row"><input id="nf" placeholder="Field name" style="max-width:220px"><select id="nfs" style="max-width:180px">${S2.map(s=>`<option>${esc(s)}</option>`).join('')}</select><button class="p" onclick="fAdd()">${t('Add')}</button></div>
+ ${db.fields.map((f,i)=>`<div class="row"><b style="min-width:150px">${esc(f.label)}</b><span class="tag">${esc(f.sec||'Basic')}</span><button onclick="fRen(${i})">${t('Rename')}</button><button class="d" onclick="fDel(${i})">${t('Remove')}</button></div>`).join('')}</div>`}
+function secAdd(){const v=$('#ns').value.trim();if(v&&v!='Basic'&&!db.secs.includes(v)){db.secs.push(v);save();R()}}
+function secRen(i){const v=prompt('Name',db.secs[i]);if(!v)return;db.fields.forEach(f=>{if(f.sec==db.secs[i])f.sec=v});db.secs[i]=v;save();R()}
+function secDel(i){if(confirm('Remove tab? Its fields move to Basic.')){db.fields.forEach(f=>{if(f.sec==db.secs[i])f.sec=''});db.secs.splice(i,1);save();R()}}
+function fAdd(){const v=$('#nf').value.trim();if(v){db.fields.push({id:'x'+uid(),label:v,sec:$('#nfs').value=='Basic'?'':$('#nfs').value});save();R()}}
+function fRen(i){const v=prompt('Name',db.fields[i].label);if(v){db.fields[i].label=v;save();R()}}
+function fDel(i){if(confirm('Remove?')){db.nurses.forEach(n=>n.x&&delete n.x[db.fields[i].id]);db.fields.splice(i,1);save();R()}}
+function set(){const f=db.footer;return `<div class="card"><h3>Admin Login</h3><div class="g"><div><label>${t('Username')}</label><input id="au" value="${esc(db.admin.u)}"></div><div><label>${t('Password')}</label><input id="ap" value="${esc(db.admin.p)}"></div></div>
+ <button class="p" style="margin-top:10px" onclick="db.admin={u:$('#au').value||'admin',p:$('#ap').value||'admin123'};save();alert('Saved')">${t('Save')}</button></div>
+ <div class="card"><h3>Footer (Hospital / Address / Links)</h3><label>Hospital name</label><input id="fh" value="${esc(f.h)}"><label>Address</label><input id="fa" value="${esc(f.a)}"><label>Links — one per line: Label|https://url</label><textarea id="fl" rows="3">${esc(f.l)}</textarea>
+ <button class="p" style="margin-top:10px" onclick="db.footer={h:$('#fh').value,a:$('#fa').value,l:$('#fl').value};save();R()">${t('Save')}</button></div>
+ <div class="card"><h3>Leave rules</h3><div class="row"><label style="margin:0">CL per year</label><input type="number" id="clm" value="${db.clMax}" style="max-width:90px"><button onclick="db.clMax=+$('#clm').value||20;save();alert('Saved')">${t('Save')}</button></div>
+ <p class="mu">D/O (chosen in the Duty Roster): a nurse may take as many D/O days per month as there are Fridays + government holidays in that month. The official Bangladesh 2026 holiday calendar is pre-loaded (shown in the Duty Roster); add or remove dates here:</p><div class="row"><input type="date" id="hd" style="max-width:160px"><input id="hn" placeholder="Holiday name" style="max-width:200px"><button class="p" onclick="holAdd()">${t('Add')}</button></div>
+ <label>Bulk add (one per line: YYYY-MM-DD|Holiday name) — e.g. for 2027 once the gazette is out</label><textarea id="hb" rows="3" placeholder="2027-01-24|Shab-e-Barat"></textarea><div class="row" style="margin-top:6px"><button onclick="holBulk()">Import dates</button><button onclick="holReload()">Reload official Bangladesh 2026 list</button></div>
+ ${db.hol.map((h,i)=>`<span class="chip">${h.date} ${esc(h.name)}<b onclick="db.hol.splice(${i},1);save();R()">×</b></span>`).join('')||'<p class="mu">No holidays added yet.</p>'}</div>
+ ${listEd('attTypes','Attendance Types')}
+ <div class="card"><h3>Backup / Restore</h3><p class="mu">Data is saved in this browser — take regular backups.</p><div class="row"><button class="p" onclick="bk()">⬇ Download Backup</button><input type="file" accept=".json" onchange="rs(this)" style="max-width:240px"><button class="d" onclick="if(confirm('Delete ALL data?')){try{localStorage.removeItem('nurseapp')}catch(e){}load();S.user=null;R()}">Reset All</button></div></div>`}
+function holAdd(){const d=$('#hd').value;if(!d||db.hol.some(h=>h.date==d))return;db.hol.push({date:d,name:$('#hn').value.trim()});db.hol.sort((a,b)=>a.date.localeCompare(b.date));save();R()}
+function bk(){saveFile('nms-backup-'+today()+'.json',JSON.stringify(db))}
+function rs(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{JSON.parse(r.result);localStorage.setItem('nurseapp',r.result);load();save();alert('Restored');R()}catch(e){alert('Invalid file')}};r.readAsText(f)}
+load();R();
+</script></body></html>
