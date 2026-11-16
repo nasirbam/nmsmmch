@@ -35,6 +35,16 @@ data class NursePendingUpdate(
     val ward: String = ""
 )
 
+data class PasswordResetRequest(
+    val id: String,
+    val nurseId: String,
+    val name: String,
+    val phone: String,
+    val hris: String,
+    val newPass: String,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
 data class DutyRequest(
     val id: String,
     val type: String = "duty", // "duty" or "tr"

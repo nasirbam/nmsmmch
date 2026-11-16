@@ -59,6 +59,7 @@ class NmsRepository(private val context: Context) {
             address = "Dhaka, Bangladesh",
             links = "Hospital Portal|https://dghs.gov.bd"
         ),
+        val passwordResetRequests: List<PasswordResetRequest> = emptyList(),
         val currentUser: CurrentUser? = null
     )
 
@@ -70,11 +71,6 @@ class NmsRepository(private val context: Context) {
 
     private val _syncMessage = MutableStateFlow<String?>(null)
     val syncMessage: StateFlow<String?> = _syncMessage.asStateFlow()
-
-    init {
-        loadData()
-        syncFromCloud(pushIfEmpty = true)
-    }
 
     private val defaultHolidays = listOf(
         Holiday("2026-02-04", "Shab-e-Barat"),
@@ -195,6 +191,11 @@ class NmsRepository(private val context: Context) {
             status = "ok"
         )
     )
+
+    init {
+        loadData()
+        syncFromCloud(pushIfEmpty = true)
+    }
 
     private fun loadData() {
         val rawJson = prefs.getString("nms_json", null)
@@ -547,6 +548,26 @@ class NmsRepository(private val context: Context) {
                 holList.addAll(defaultHolidays)
             }
 
+            // Password Reset Requests
+            val pwResetsList = mutableListOf<PasswordResetRequest>()
+            val pwArr = root.optJSONArray("pwResets")
+            if (pwArr != null) {
+                for (i in 0 until pwArr.length()) {
+                    val po = pwArr.getJSONObject(i)
+                    pwResetsList.add(
+                        PasswordResetRequest(
+                            id = po.optString("id", UUID.randomUUID().toString()),
+                            nurseId = po.optString("nurse", ""),
+                            name = po.optString("name", ""),
+                            phone = po.optString("phone", ""),
+                            hris = po.optString("hris", ""),
+                            newPass = po.optString("pass", ""),
+                            timestamp = po.optLong("ts", System.currentTimeMillis())
+                        )
+                    )
+                }
+            }
+
             AppState(
                 adminUser = adminU,
                 adminPass = adminP,
@@ -570,6 +591,7 @@ class NmsRepository(private val context: Context) {
                 customSections = secsList,
                 customFields = fieldsList,
                 footer = footer,
+                passwordResetRequests = pwResetsList,
                 currentUser = preservedUser
             )
         } catch (e: Exception) {
@@ -810,6 +832,21 @@ class NmsRepository(private val context: Context) {
         }
         root.put("footer", footerObj)
 
+        val pwResetsArr = JSONArray()
+        cur.passwordResetRequests.forEach { pr ->
+            val po = JSONObject().apply {
+                put("id", pr.id)
+                put("nurse", pr.nurseId)
+                put("name", pr.name)
+                put("phone", pr.phone)
+                put("hris", pr.hris)
+                put("pass", pr.newPass)
+                put("ts", pr.timestamp)
+            }
+            pwResetsArr.put(po)
+        }
+        root.put("pwResets", pwResetsArr)
+
         return root.toString()
     }
 
@@ -928,6 +965,137 @@ class NmsRepository(private val context: Context) {
 
     fun logout() {
         _state.value = _state.value.copy(currentUser = null)
+    }
+
+    // Password Restore / Reset
+    fun restoreNursePasswordInstant(
+        phone: String,
+        hris: String,
+        dobOrReg: String,
+        newPass: String
+    ): String? {
+        val cleanPhone = phone.trim()
+        val cleanHris = hris.trim()
+        val cleanVerify = dobOrReg.trim()
+        val cleanPass = newPass.trim()
+
+        if (cleanPhone.isEmpty() || cleanHris.isEmpty()) {
+            return "Phone number and HRIS ID are required."
+        }
+        if (cleanPass.length < 6) {
+            return "New password must be at least 6 characters."
+        }
+        if (cleanPass == "1234" || cleanPass == "admin123") {
+            return "Please choose a stronger private password."
+        }
+
+        val cur = _state.value
+        val nurse = cur.nurses.find {
+            it.phone.trim() == cleanPhone && it.hris.trim().equals(cleanHris, ignoreCase = true)
+        } ?: return "No nurse account found matching that Phone No. and HRIS ID."
+
+        if (nurse.status == "pend") {
+            return "Your registration is still pending admin approval."
+        }
+
+        val hasDob = nurse.dob.trim().isNotEmpty()
+        val hasReg = nurse.reg.trim().isNotEmpty()
+        if (!hasDob && !hasReg) {
+            return "No Date of Birth or BNMC Reg. No. is saved on your profile for instant verification. Please use 'Send Reset Request to Admin' instead."
+        }
+        if (cleanVerify.isEmpty()) {
+            return "Please enter your Date of Birth (YYYY-MM-DD) or BNMC Reg. No. to verify your identity."
+        }
+
+        val dobMatches = hasDob && nurse.dob.trim() == cleanVerify
+        val regMatches = hasReg && nurse.reg.trim().equals(cleanVerify, ignoreCase = true)
+        if (!dobMatches && !regMatches) {
+            return "Verification failed. Date of Birth or BNMC Reg. No. does not match your profile."
+        }
+
+        val updatedNurses = cur.nurses.map {
+            if (it.id == nurse.id) it.copy(pass = cleanPass) else it
+        }
+        val updatedResets = cur.passwordResetRequests.filter { it.nurseId != nurse.id }
+        _state.value = cur.copy(nurses = updatedNurses, passwordResetRequests = updatedResets)
+        addNotification(
+            text = "Password restored via self-verification for ${nurse.name}",
+            type = "news",
+            isAll = false
+        )
+        saveData()
+        return null
+    }
+
+    fun requestPasswordReset(
+        phone: String,
+        hris: String,
+        newPass: String
+    ): String? {
+        val cleanPhone = phone.trim()
+        val cleanHris = hris.trim()
+        val cleanPass = newPass.trim()
+
+        if (cleanPhone.isEmpty() || cleanHris.isEmpty()) {
+            return "Phone number and HRIS ID are required."
+        }
+        if (cleanPass.length < 6) {
+            return "New password must be at least 6 characters."
+        }
+        if (cleanPass == "1234" || cleanPass == "admin123") {
+            return "Please choose a stronger private password."
+        }
+
+        val cur = _state.value
+        val nurse = cur.nurses.find {
+            it.phone.trim() == cleanPhone && it.hris.trim().equals(cleanHris, ignoreCase = true)
+        } ?: return "No nurse account found matching that Phone No. and HRIS ID."
+
+        if (nurse.status == "pend") {
+            return "Your registration is still pending admin approval."
+        }
+
+        val req = PasswordResetRequest(
+            id = UUID.randomUUID().toString(),
+            nurseId = nurse.id,
+            name = nurse.name,
+            phone = nurse.phone,
+            hris = nurse.hris,
+            newPass = cleanPass,
+            timestamp = System.currentTimeMillis()
+        )
+        val updatedResets = cur.passwordResetRequests.filter { it.nurseId != nurse.id } + req
+        _state.value = cur.copy(passwordResetRequests = updatedResets)
+        addNotification(
+            text = "Password reset requested by ${nurse.name} (${nurse.phone})",
+            type = "news",
+            isAll = false
+        )
+        saveData()
+        return null
+    }
+
+    fun approvePasswordReset(requestId: String) {
+        val cur = _state.value
+        val req = cur.passwordResetRequests.find { it.id == requestId } ?: return
+        val updatedNurses = cur.nurses.map {
+            if (it.id == req.nurseId) it.copy(pass = req.newPass) else it
+        }
+        val updatedResets = cur.passwordResetRequests.filter { it.id != requestId }
+        _state.value = cur.copy(nurses = updatedNurses, passwordResetRequests = updatedResets)
+        addNotification(
+            text = "Password reset approved for ${req.name}",
+            type = "news",
+            isAll = true
+        )
+        saveData()
+    }
+
+    fun rejectPasswordReset(requestId: String) {
+        val cur = _state.value
+        val updatedResets = cur.passwordResetRequests.filter { it.id != requestId }
+        _state.value = cur.copy(passwordResetRequests = updatedResets)
+        saveData()
     }
 
     // Nurse registrations

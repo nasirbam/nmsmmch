@@ -99,9 +99,10 @@ class NmsViewModel(application: Application) : AndroidViewModel(application) {
         val isAdmin = s.currentUser?.role == "admin"
         val pendingRegistrations = if (isAdmin) s.nurses.count { it.status == "pend" } else 0
         val pendingUpdates = if (isAdmin) s.nurses.count { it.pend != null } else 0
+        val pendingPwResets = if (isAdmin) s.passwordResetRequests.size else 0
         val pendingLeaves = s.leaves.count { it.stage in listOf("NI", "SUP", "FIN") }
         val pendingRoster = s.dutyRequests.count { it.stage in listOf("NI", "SUP") }
-        return pendingRegistrations + pendingUpdates + pendingLeaves + pendingRoster
+        return pendingRegistrations + pendingUpdates + pendingPwResets + pendingLeaves + pendingRoster
     }
 
     fun getUnreadNotificationCount(): Int {

@@ -42,6 +42,10 @@ fun ApprovalsScreen(
         if (isAdmin) state.nurses.filter { it.pend != null } else emptyList()
     }
 
+    val pendingPwResets = remember(state.passwordResetRequests, isAdmin) {
+        if (isAdmin) state.passwordResetRequests else emptyList()
+    }
+
     val pendingLeaves = remember(state.leaves, currentRank, isAdmin) {
         state.leaves.filter { l ->
             l.stage in listOf("NI", "SUP", "FIN")
@@ -54,7 +58,7 @@ fun ApprovalsScreen(
         }
     }
 
-    val totalPending = pendingRegistrations.size + pendingProfileUpdates.size + pendingLeaves.size + pendingDutyRequests.size
+    val totalPending = pendingRegistrations.size + pendingProfileUpdates.size + pendingPwResets.size + pendingLeaves.size + pendingDutyRequests.size
 
     LazyColumn(
         modifier = modifier
@@ -151,6 +155,59 @@ fun ApprovalsScreen(
                                 onClick = { viewModel.repository.rejectProfileUpdate(nurse.id) },
                                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFB91C1C))
                             ) {
+                                Text("Reject")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Section 2b: Password Reset Requests (Admin only)
+        if (pendingPwResets.isNotEmpty()) {
+            item {
+                Text(
+                    text = "🔑 Password Reset Requests (${pendingPwResets.size})",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = TealPrimary
+                )
+            }
+            items(pendingPwResets) { req ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(req.name, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(
+                            "Phone: ${req.phone} • HRIS: ${req.hris}",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            "Requested password restore to a new private password",
+                            fontSize = 11.sp,
+                            color = Color(0xFFD97706),
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(
+                                onClick = { viewModel.repository.approvePasswordReset(req.id) },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF15803D))
+                            ) {
+                                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Approve Reset")
+                            }
+                            OutlinedButton(
+                                onClick = { viewModel.repository.rejectPasswordReset(req.id) },
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFB91C1C))
+                            ) {
+                                Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text("Reject")
                             }
                         }
