@@ -2,9 +2,15 @@ package com.example.data
 
 import android.content.Context
 import com.example.data.model.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -13,6 +19,8 @@ import java.util.*
 class NmsRepository(private val context: Context) {
 
     private val prefs = context.getSharedPreferences("nms_data_prefs", Context.MODE_PRIVATE)
+    private val syncScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val syncMutex = Mutex()
 
     data class AppState(
         val adminUser: String = "admin",
@@ -57,8 +65,15 @@ class NmsRepository(private val context: Context) {
     private val _state = MutableStateFlow(AppState())
     val state: StateFlow<AppState> = _state.asStateFlow()
 
+    private val _syncStatus = MutableStateFlow(SupabaseSync.SyncStatus.IDLE)
+    val syncStatus: StateFlow<SupabaseSync.SyncStatus> = _syncStatus.asStateFlow()
+
+    private val _syncMessage = MutableStateFlow<String?>(null)
+    val syncMessage: StateFlow<String?> = _syncMessage.asStateFlow()
+
     init {
         loadData()
+        syncFromCloud(pushIfEmpty = true)
     }
 
     private val defaultHolidays = listOf(
@@ -184,18 +199,24 @@ class NmsRepository(private val context: Context) {
     private fun loadData() {
         val rawJson = prefs.getString("nms_json", null)
         if (rawJson == null) {
-            // Seed initial data
             val initial = AppState(
                 nurses = sampleNurses,
                 holidays = defaultHolidays,
                 roster = createSampleRoster()
             )
             _state.value = initial
-            saveData(initial)
+            val initialJson = serializeStateToJson(initial)
+            prefs.edit().putString("nms_json", initialJson).apply()
             return
         }
 
-        try {
+        val preservedUser = _state.value.currentUser
+        val parsed = parseJsonToState(rawJson, preservedUser)
+        _state.value = parsed
+    }
+
+    private fun parseJsonToState(rawJson: String, preservedUser: CurrentUser?): AppState {
+        return try {
             val root = JSONObject(rawJson)
             val adminObj = root.optJSONObject("admin")
             val adminU = adminObj?.optString("u", "admin") ?: "admin"
@@ -265,8 +286,6 @@ class NmsRepository(private val context: Context) {
                         )
                     )
                 }
-            } else {
-                nursesList.addAll(sampleNurses)
             }
 
             // Roster
@@ -326,6 +345,54 @@ class NmsRepository(private val context: Context) {
                 }
             }
 
+            // Leave Types
+            val leaveTypesList = mutableListOf<LeaveType>()
+            val ltArr = root.optJSONArray("leaveTypes")
+            if (ltArr != null && ltArr.length() > 0) {
+                for (i in 0 until ltArr.length()) {
+                    val lto = ltArr.getJSONObject(i)
+                    leaveTypesList.add(
+                        LeaveType(
+                            code = lto.optString("c", "CL"),
+                            name = lto.optString("n", "Casual Leave"),
+                            nurseSelfEntry = lto.optInt("ne", 0) == 1 || lto.optBoolean("ne", false)
+                        )
+                    )
+                }
+            } else {
+                leaveTypesList.addAll(
+                    listOf(
+                        LeaveType("CL", "Casual Leave", nurseSelfEntry = true),
+                        LeaveType("ML", "Maternity Leave"),
+                        LeaveType("EL", "Earn Leave"),
+                        LeaveType("RRL", "Rest & Recreation Leave")
+                    )
+                )
+            }
+
+            // Attendance Types
+            val attTypesList = mutableListOf<AttendanceType>()
+            val atArr = root.optJSONArray("attTypes")
+            if (atArr != null && atArr.length() > 0) {
+                for (i in 0 until atArr.length()) {
+                    val ato = atArr.getJSONObject(i)
+                    attTypesList.add(
+                        AttendanceType(
+                            code = ato.optString("c", "P"),
+                            name = ato.optString("n", "Present")
+                        )
+                    )
+                }
+            } else {
+                attTypesList.addAll(
+                    listOf(
+                        AttendanceType("P", "Present"),
+                        AttendanceType("A", "Absent"),
+                        AttendanceType("Late", "Late")
+                    )
+                )
+            }
+
             // Attendance
             val attMap = mutableMapOf<String, String>()
             val attObj = root.optJSONObject("att")
@@ -364,6 +431,100 @@ class NmsRepository(private val context: Context) {
                 }
             }
 
+            // Complaints
+            val compList = mutableListOf<Complaint>()
+            val compArr = root.optJSONArray("complaints")
+            if (compArr != null) {
+                for (i in 0 until compArr.length()) {
+                    val co = compArr.getJSONObject(i)
+                    val logsList = mutableListOf<ComplaintLog>()
+                    val logArr = co.optJSONArray("log")
+                    if (logArr != null) {
+                        for (j in 0 until logArr.length()) {
+                            val lo = logArr.getJSONObject(j)
+                            logsList.add(
+                                ComplaintLog(
+                                    uid = lo.optString("uid", ""),
+                                    byName = lo.optString("by", ""),
+                                    role = lo.optString("role", ""),
+                                    text = lo.optString("text", ""),
+                                    action = lo.optString("act", ""),
+                                    date = lo.optString("date", "")
+                                )
+                            )
+                        }
+                    }
+                    compList.add(
+                        Complaint(
+                            id = co.optString("id", UUID.randomUUID().toString()),
+                            byNurseId = co.optString("by", ""),
+                            subject = co.optString("subject", ""),
+                            text = co.optString("text", ""),
+                            date = co.optString("date", ""),
+                            status = co.optString("status", "open"),
+                            level = co.optInt("lvl", 2),
+                            logs = logsList
+                        )
+                    )
+                }
+            }
+
+            // Notifications
+            val notesList = mutableListOf<NotificationItem>()
+            val notesArr = root.optJSONArray("notes")
+            if (notesArr != null) {
+                for (i in 0 until notesArr.length()) {
+                    val no = notesArr.getJSONObject(i)
+                    val idsList = mutableListOf<String>()
+                    val idsArr = no.optJSONArray("ids")
+                    if (idsArr != null) {
+                        for (j in 0 until idsArr.length()) idsList.add(idsArr.getString(j))
+                    }
+                    notesList.add(
+                        NotificationItem(
+                            id = no.optString("id", UUID.randomUUID().toString()),
+                            timestamp = no.optLong("ts", System.currentTimeMillis()),
+                            text = no.optString("text", ""),
+                            type = no.optString("type", "news"),
+                            ward = no.optString("ward", ""),
+                            nurseIds = idsList,
+                            isAll = no.optBoolean("all", false),
+                            by = no.optString("by", "")
+                        )
+                    )
+                }
+            }
+
+            // Custom sections & fields
+            val secsList = mutableListOf<String>()
+            val secsArr = root.optJSONArray("secs")
+            if (secsArr != null) {
+                for (i in 0 until secsArr.length()) secsList.add(secsArr.getString(i))
+            }
+
+            val fieldsList = mutableListOf<CustomField>()
+            val fieldsArr = root.optJSONArray("fields")
+            if (fieldsArr != null) {
+                for (i in 0 until fieldsArr.length()) {
+                    val fo = fieldsArr.getJSONObject(i)
+                    fieldsList.add(
+                        CustomField(
+                            id = fo.optString("id", ""),
+                            label = fo.optString("label", ""),
+                            section = fo.optString("sec", "Basic")
+                        )
+                    )
+                }
+            }
+
+            // Footer
+            val fo = root.optJSONObject("footer")
+            val footer = HospitalFooter(
+                hospitalName = fo?.optString("h", "") ?: "",
+                address = fo?.optString("a", "") ?: "",
+                links = fo?.optString("l", "") ?: ""
+            )
+
             // News
             val newsList = mutableListOf<NewsItem>()
             val newsArr = root.optJSONArray("news")
@@ -377,7 +538,7 @@ class NmsRepository(private val context: Context) {
             // Holidays
             val holList = mutableListOf<Holiday>()
             val holArr = root.optJSONArray("hol")
-            if (holArr != null) {
+            if (holArr != null && holArr.length() > 0) {
                 for (i in 0 until holArr.length()) {
                     val ho = holArr.getJSONObject(i)
                     holList.add(Holiday(ho.optString("date", ""), ho.optString("name", "")))
@@ -386,25 +547,33 @@ class NmsRepository(private val context: Context) {
                 holList.addAll(defaultHolidays)
             }
 
-            _state.value = AppState(
+            AppState(
                 adminUser = adminU,
                 adminPass = adminP,
                 wards = wardsList,
                 nurses = nursesList,
                 dutyRequests = rqList,
                 leaves = leavesList,
+                leaveTypes = leaveTypesList,
+                attTypes = attTypesList,
                 roster = rosterMap,
                 attendance = attMap,
                 arrivalTimes = atmMap,
                 acr = acrMap,
+                complaints = compList,
                 news = newsList.ifEmpty {
                     listOf(NewsItem("n1", "**Welcome!** Welcome to NMS. **Important notices** will appear here."))
                 },
-                holidays = holList.ifEmpty { defaultHolidays },
-                clMax = root.optInt("clMax", 20)
+                notifications = notesList,
+                holidays = holList,
+                clMax = root.optInt("clMax", 20),
+                customSections = secsList,
+                customFields = fieldsList,
+                footer = footer,
+                currentUser = preservedUser
             )
         } catch (e: Exception) {
-            _state.value = AppState(nurses = sampleNurses, holidays = defaultHolidays)
+            AppState(nurses = sampleNurses, holidays = defaultHolidays, currentUser = preservedUser)
         }
     }
 
@@ -421,138 +590,298 @@ class NmsRepository(private val context: Context) {
         return sample
     }
 
+    private fun serializeStateToJson(cur: AppState): String {
+        val existingRaw = prefs.getString("nms_json", null)
+        val root = try {
+            if (existingRaw != null) JSONObject(existingRaw) else JSONObject()
+        } catch (e: Exception) {
+            JSONObject()
+        }
+
+        val adminObj = JSONObject().apply {
+            put("u", cur.adminUser)
+            put("p", cur.adminPass)
+        }
+        root.put("admin", adminObj)
+
+        val wardsArr = JSONArray()
+        cur.wards.forEach { wardsArr.put(it) }
+        root.put("wards", wardsArr)
+
+        val nursesArr = JSONArray()
+        cur.nurses.forEach { n ->
+            val no = JSONObject()
+            no.put("id", n.id)
+            no.put("name", n.name)
+            no.put("father", n.father)
+            no.put("mother", n.mother)
+            no.put("dob", n.dob)
+            no.put("workplace", n.workplace)
+            no.put("phone", n.phone)
+            no.put("reg", n.reg)
+            no.put("hris", n.hris)
+            no.put("join", n.joinDate)
+            no.put("course", n.course)
+            no.put("cat", n.cat)
+            no.put("ward", n.ward)
+            no.put("pass", n.pass)
+            no.put("st", n.status)
+
+            val xo = JSONObject()
+            n.extraFields.forEach { (k, v) -> xo.put(k, v) }
+            no.put("x", xo)
+
+            if (n.pend != null) {
+                val po = JSONObject()
+                po.put("name", n.pend.name)
+                po.put("phone", n.pend.phone)
+                po.put("cat", n.pend.cat)
+                po.put("ward", n.pend.ward)
+                po.put("father", n.pend.father)
+                po.put("mother", n.pend.mother)
+                po.put("dob", n.pend.dob)
+                po.put("workplace", n.pend.workplace)
+                po.put("reg", n.pend.reg)
+                po.put("hris", n.pend.hris)
+                po.put("join", n.pend.joinDate)
+                po.put("course", n.pend.course)
+                no.put("pend", po)
+            } else {
+                no.remove("pend")
+            }
+            nursesArr.put(no)
+        }
+        root.put("nurses", nursesArr)
+
+        val rosterObj = JSONObject()
+        cur.roster.forEach { (k, list) ->
+            val arr = JSONArray()
+            list.forEach { arr.put(it) }
+            rosterObj.put(k, arr)
+        }
+        root.put("roster", rosterObj)
+
+        val rqArr = JSONArray()
+        cur.dutyRequests.forEach { q ->
+            val qo = JSONObject()
+            qo.put("id", q.id)
+            qo.put("type", q.type)
+            qo.put("nurse", q.nurseId)
+            qo.put("date", q.date)
+            qo.put("ward", q.ward)
+            qo.put("shift", q.shift)
+            qo.put("stage", q.stage)
+            qo.put("to", q.toWard)
+            rqArr.put(qo)
+        }
+        root.put("rq", rqArr)
+
+        val lvArr = JSONArray()
+        cur.leaves.forEach { l ->
+            val lo = JSONObject()
+            lo.put("id", l.id)
+            lo.put("nurse", l.nurseId)
+            lo.put("type", l.type)
+            lo.put("from", l.from)
+            lo.put("to", l.to)
+            lo.put("reason", l.reason)
+            lo.put("stage", l.stage)
+            lvArr.put(lo)
+        }
+        root.put("leaves", lvArr)
+
+        val ltArr = JSONArray()
+        cur.leaveTypes.forEach { lt ->
+            val lto = JSONObject()
+            lto.put("c", lt.code)
+            lto.put("n", lt.name)
+            if (lt.nurseSelfEntry) lto.put("ne", 1)
+            ltArr.put(lto)
+        }
+        root.put("leaveTypes", ltArr)
+
+        val atArr = JSONArray()
+        cur.attTypes.forEach { at ->
+            val ato = JSONObject()
+            ato.put("c", at.code)
+            ato.put("n", at.name)
+            atArr.put(ato)
+        }
+        root.put("attTypes", atArr)
+
+        val attObj = JSONObject()
+        cur.attendance.forEach { (k, v) -> attObj.put(k, v) }
+        root.put("att", attObj)
+
+        val atmObj = JSONObject()
+        cur.arrivalTimes.forEach { (k, list) ->
+            val arr = JSONArray()
+            list.forEach { arr.put(it) }
+            atmObj.put(k, arr)
+        }
+        root.put("atm", atmObj)
+
+        val acrObj = JSONObject()
+        cur.acr.forEach { (k, v) -> acrObj.put(k, v) }
+        root.put("acr", acrObj)
+
+        val compArr = JSONArray()
+        cur.complaints.forEach { c ->
+            val co = JSONObject()
+            co.put("id", c.id)
+            co.put("by", c.byNurseId)
+            co.put("subject", c.subject)
+            co.put("text", c.text)
+            co.put("date", c.date)
+            co.put("status", c.status)
+            co.put("lvl", c.level)
+            val logArr = JSONArray()
+            c.logs.forEach { l ->
+                val lo = JSONObject()
+                lo.put("uid", l.uid)
+                lo.put("by", l.byName)
+                lo.put("role", l.role)
+                lo.put("text", l.text)
+                lo.put("act", l.action)
+                lo.put("date", l.date)
+                logArr.put(lo)
+            }
+            co.put("log", logArr)
+            compArr.put(co)
+        }
+        root.put("complaints", compArr)
+
+        val notesArr = JSONArray()
+        cur.notifications.forEach { n ->
+            val no = JSONObject()
+            no.put("id", n.id)
+            no.put("ts", n.timestamp)
+            no.put("text", n.text)
+            no.put("type", n.type)
+            no.put("ward", n.ward)
+            val idsArr = JSONArray()
+            n.nurseIds.forEach { idsArr.put(it) }
+            no.put("ids", idsArr)
+            no.put("all", n.isAll)
+            no.put("by", n.by)
+            notesArr.put(no)
+        }
+        root.put("notes", notesArr)
+
+        val newsArr = JSONArray()
+        cur.news.forEach { nw ->
+            val no = JSONObject()
+            no.put("id", nw.id)
+            no.put("text", nw.text)
+            newsArr.put(no)
+        }
+        root.put("news", newsArr)
+
+        val holArr = JSONArray()
+        cur.holidays.forEach { h ->
+            val ho = JSONObject()
+            ho.put("date", h.date)
+            ho.put("name", h.name)
+            holArr.put(ho)
+        }
+        root.put("hol", holArr)
+        root.put("holSeed26", 1)
+        root.put("doMoved", 1)
+        root.put("clMax", cur.clMax)
+
+        val secsArr = JSONArray()
+        cur.customSections.forEach { secsArr.put(it) }
+        root.put("secs", secsArr)
+
+        val fieldsArr = JSONArray()
+        cur.customFields.forEach { f ->
+            val fo = JSONObject()
+            fo.put("id", f.id)
+            fo.put("label", f.label)
+            fo.put("sec", if (f.section == "Basic") "" else f.section)
+            fieldsArr.put(fo)
+        }
+        root.put("fields", fieldsArr)
+
+        val footerObj = JSONObject().apply {
+            put("h", cur.footer.hospitalName)
+            put("a", cur.footer.address)
+            put("l", cur.footer.links)
+        }
+        root.put("footer", footerObj)
+
+        return root.toString()
+    }
+
     fun saveData(customState: AppState? = null) {
         val cur = customState ?: _state.value
+        if (customState != null) {
+            _state.value = customState
+        }
         try {
-            val root = JSONObject()
-            val adminObj = JSONObject()
-            adminObj.put("u", cur.adminUser)
-            adminObj.put("p", cur.adminPass)
-            root.put("admin", adminObj)
-
-            val wardsArr = JSONArray()
-            cur.wards.forEach { wardsArr.put(it) }
-            root.put("wards", wardsArr)
-
-            val nursesArr = JSONArray()
-            cur.nurses.forEach { n ->
-                val no = JSONObject()
-                no.put("id", n.id)
-                no.put("name", n.name)
-                no.put("father", n.father)
-                no.put("mother", n.mother)
-                no.put("dob", n.dob)
-                no.put("workplace", n.workplace)
-                no.put("phone", n.phone)
-                no.put("reg", n.reg)
-                no.put("hris", n.hris)
-                no.put("join", n.joinDate)
-                no.put("course", n.course)
-                no.put("cat", n.cat)
-                no.put("ward", n.ward)
-                no.put("pass", n.pass)
-                no.put("st", n.status)
-
-                val xo = JSONObject()
-                n.extraFields.forEach { (k, v) -> xo.put(k, v) }
-                no.put("x", xo)
-
-                if (n.pend != null) {
-                    val po = JSONObject()
-                    po.put("name", n.pend.name)
-                    po.put("phone", n.pend.phone)
-                    po.put("cat", n.pend.cat)
-                    po.put("ward", n.pend.ward)
-                    po.put("father", n.pend.father)
-                    po.put("mother", n.pend.mother)
-                    po.put("dob", n.pend.dob)
-                    po.put("workplace", n.pend.workplace)
-                    po.put("reg", n.pend.reg)
-                    po.put("hris", n.pend.hris)
-                    po.put("join", n.pend.joinDate)
-                    po.put("course", n.pend.course)
-                    no.put("pend", po)
-                }
-
-                nursesArr.put(no)
-            }
-            root.put("nurses", nursesArr)
-
-            val rosterObj = JSONObject()
-            cur.roster.forEach { (k, list) ->
-                val arr = JSONArray()
-                list.forEach { arr.put(it) }
-                rosterObj.put(k, arr)
-            }
-            root.put("roster", rosterObj)
-
-            val rqArr = JSONArray()
-            cur.dutyRequests.forEach { q ->
-                val qo = JSONObject()
-                qo.put("id", q.id)
-                qo.put("type", q.type)
-                qo.put("nurse", q.nurseId)
-                qo.put("date", q.date)
-                qo.put("ward", q.ward)
-                qo.put("shift", q.shift)
-                qo.put("stage", q.stage)
-                qo.put("to", q.toWard)
-                rqArr.put(qo)
-            }
-            root.put("rq", rqArr)
-
-            val lvArr = JSONArray()
-            cur.leaves.forEach { l ->
-                val lo = JSONObject()
-                lo.put("id", l.id)
-                lo.put("nurse", l.nurseId)
-                lo.put("type", l.type)
-                lo.put("from", l.from)
-                lo.put("to", l.to)
-                lo.put("reason", l.reason)
-                lo.put("stage", l.stage)
-                lvArr.put(lo)
-            }
-            root.put("leaves", lvArr)
-
-            val attObj = JSONObject()
-            cur.attendance.forEach { (k, v) -> attObj.put(k, v) }
-            root.put("att", attObj)
-
-            val atmObj = JSONObject()
-            cur.arrivalTimes.forEach { (k, list) ->
-                val arr = JSONArray()
-                list.forEach { arr.put(it) }
-                atmObj.put(k, arr)
-            }
-            root.put("atm", atmObj)
-
-            val acrObj = JSONObject()
-            cur.acr.forEach { (k, v) -> acrObj.put(k, v) }
-            root.put("acr", acrObj)
-
-            val newsArr = JSONArray()
-            cur.news.forEach { nw ->
-                val no = JSONObject()
-                no.put("id", nw.id)
-                no.put("text", nw.text)
-                newsArr.put(no)
-            }
-            root.put("news", newsArr)
-
-            val holArr = JSONArray()
-            cur.holidays.forEach { h ->
-                val ho = JSONObject()
-                ho.put("date", h.date)
-                ho.put("name", h.name)
-                holArr.put(ho)
-            }
-            root.put("hol", holArr)
-            root.put("clMax", cur.clMax)
-
-            prefs.edit().putString("nms_json", root.toString()).apply()
+            val json = serializeStateToJson(cur)
+            prefs.edit().putString("nms_json", json).apply()
+            pushToCloud(json)
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    fun refreshFromCloud() {
+        syncFromCloud(pushIfEmpty = false)
+    }
+
+    private fun syncFromCloud(pushIfEmpty: Boolean) {
+        syncScope.launch {
+            syncMutex.withLock {
+                _syncStatus.value = SupabaseSync.SyncStatus.SYNCING
+                when (val result = SupabaseSync.fetchState()) {
+                    is SupabaseSync.FetchResult.Found -> {
+                        val cloudJson = result.dataJson
+                        prefs.edit().putString("nms_json", cloudJson).apply()
+                        val currentUser = _state.value.currentUser
+                        _state.value = parseJsonToState(cloudJson, currentUser)
+                        _syncStatus.value = SupabaseSync.SyncStatus.SYNCED
+                        _syncMessage.value = "Cloud synced"
+                    }
+                    is SupabaseSync.FetchResult.Empty -> {
+                        if (pushIfEmpty) {
+                            val localJson = prefs.getString("nms_json", null)
+                                ?: serializeStateToJson(_state.value)
+                            val pushed = SupabaseSync.pushState(localJson)
+                            if (pushed.isSuccess) {
+                                _syncStatus.value = SupabaseSync.SyncStatus.SYNCED
+                                _syncMessage.value = "Cloud initialized"
+                            } else {
+                                _syncStatus.value = SupabaseSync.SyncStatus.OFFLINE
+                                _syncMessage.value = pushed.exceptionOrNull()?.message
+                            }
+                        } else {
+                            _syncStatus.value = SupabaseSync.SyncStatus.SYNCED
+                        }
+                    }
+                    is SupabaseSync.FetchResult.Error -> {
+                        _syncStatus.value = SupabaseSync.SyncStatus.OFFLINE
+                        _syncMessage.value = result.message
+                    }
+                }
+            }
+        }
+    }
+
+    private fun pushToCloud(json: String) {
+        syncScope.launch {
+            syncMutex.withLock {
+                _syncStatus.value = SupabaseSync.SyncStatus.SYNCING
+                val res = SupabaseSync.pushState(json)
+                if (res.isSuccess) {
+                    _syncStatus.value = SupabaseSync.SyncStatus.SYNCED
+                    _syncMessage.value = "Saved to cloud"
+                } else {
+                    _syncStatus.value = SupabaseSync.SyncStatus.OFFLINE
+                    _syncMessage.value = res.exceptionOrNull()?.message
+                }
+            }
         }
     }
 
@@ -565,6 +894,7 @@ class NmsRepository(private val context: Context) {
             JSONObject(jsonContent) // validate
             prefs.edit().putString("nms_json", jsonContent).apply()
             loadData()
+            pushToCloud(jsonContent)
             true
         } catch (e: Exception) {
             false
@@ -576,6 +906,7 @@ class NmsRepository(private val context: Context) {
         val cur = _state.value
         if (u.trim() == cur.adminUser && p == cur.adminPass) {
             _state.value = cur.copy(currentUser = CurrentUser(role = "admin"))
+            refreshFromCloud()
             return true
         }
         return false
@@ -591,6 +922,7 @@ class NmsRepository(private val context: Context) {
         }
 
         _state.value = cur.copy(currentUser = CurrentUser(role = "staff", nurseId = nurse.id))
+        refreshFromCloud()
         return null
     }
 
@@ -703,7 +1035,6 @@ class NmsRepository(private val context: Context) {
         val userRank = getCurrentRank()
         val key = "$date|$ward|$shift"
 
-        // Check if already assigned on that date in another ward
         if (shift.isNotEmpty()) {
             val hasOtherWard = cur.roster.entries.any {
                 it.key.startsWith("$date|") && !it.key.startsWith("$date|$ward|") && it.value.contains(nurseId)
@@ -711,9 +1042,7 @@ class NmsRepository(private val context: Context) {
             if (hasOtherWard) return
         }
 
-        // Supervisor or higher: Direct entry
         if (userRank >= 3 || cur.currentUser?.role == "admin") {
-            // Remove previous shift on this day in this ward
             val newRoster = cur.roster.toMutableMap()
             listOf("M", "E", "N", "D").forEach { s ->
                 val k = "$date|$ward|$s"
@@ -724,7 +1053,6 @@ class NmsRepository(private val context: Context) {
                 val list = (newRoster[key] ?: emptyList()) + nurseId
                 newRoster[key] = list.distinct()
             }
-            // Remove any pending request
             val newRq = cur.dutyRequests.filterNot { it.date == date && it.nurseId == nurseId && it.ward == ward }
             _state.value = cur.copy(roster = newRoster, dutyRequests = newRq)
             addNotification("Duty set: ${getNurse(nurseId)?.name} - $date - ${NurseHierarchy.shiftLabel(shift)} ($ward)", "duty")
@@ -732,7 +1060,6 @@ class NmsRepository(private val context: Context) {
             return
         }
 
-        // Incharge: creates request requiring Supervisor approval
         val nextStage = if (userRank == 2) "SUP" else "NI"
         val existingRq = cur.dutyRequests.find { it.date == date && it.nurseId == nurseId && it.ward == ward && it.stage in listOf("NI", "SUP") }
 
@@ -769,7 +1096,6 @@ class NmsRepository(private val context: Context) {
         val shiftToUse = newShift ?: req.shift
 
         if (req.type == "tr") {
-            // Ward transfer
             val nurse = getNurse(req.nurseId) ?: return
             val updatedNurse = nurse.copy(ward = req.toWard)
             val updatedNurses = cur.nurses.map { if (it.id == nurse.id) updatedNurse else it }
@@ -780,10 +1106,8 @@ class NmsRepository(private val context: Context) {
             return
         }
 
-        // Step approval
         val isFinal = currentRank >= 3 || cur.currentUser?.role == "admin" || req.stage == "SUP"
         if (isFinal) {
-            // Approve into roster
             val newRoster = cur.roster.toMutableMap()
             listOf("M", "E", "N", "D").forEach { s ->
                 val k = "${req.date}|${req.ward}|$s"
@@ -796,7 +1120,6 @@ class NmsRepository(private val context: Context) {
             _state.value = cur.copy(roster = newRoster, dutyRequests = newRq)
             addNotification("Duty approved: ${getNurse(req.nurseId)?.name} - ${req.date} - ${NurseHierarchy.shiftLabel(shiftToUse)}", "duty")
         } else {
-            // Forward from Incharge to Supervisor
             val newRq = cur.dutyRequests.map {
                 if (it.id == requestId) it.copy(shift = shiftToUse, stage = "SUP") else it
             }
@@ -818,7 +1141,6 @@ class NmsRepository(private val context: Context) {
         val cur = _state.value
         val initialStage = if (getCurrentRank() >= 4 || cur.currentUser?.role == "admin") "OK" else "NI"
 
-        // Validation for CL
         if (type == "CL") {
             val days = calculateDays(from, to)
             val usedCl = getUsedClDays(nurseId, from.take(4))
@@ -1061,7 +1383,6 @@ class NmsRepository(private val context: Context) {
     }
 
     fun getDayOffAllowanceForMonth(yearMonth: String): Int {
-        // Count Fridays + Holidays in this month
         return try {
             val parts = yearMonth.split("-")
             val year = parts[0].toInt()

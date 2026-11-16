@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.SupabaseSync
 import com.example.data.model.Nurse
 import com.example.data.model.NurseHierarchy
 import com.example.ui.NmsViewModel
@@ -36,6 +37,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsState()
+    val syncStatus by viewModel.syncStatus.collectAsState()
 
     var isAdminTab by remember { mutableStateOf(false) }
     var usernameOrPhone by remember { mutableStateOf("") }
@@ -195,7 +197,7 @@ fun LoginScreen(
                         Text(if (isAdminTab) "Admin Username" else "Phone No. (Login ID)")
                     },
                     placeholder = {
-                        Text(if (isAdminTab) "admin" else "01711000001")
+                        Text(if (isAdminTab) "Enter admin username" else "01XXXXXXXXX")
                     },
                     leadingIcon = {
                         Icon(
@@ -221,7 +223,7 @@ fun LoginScreen(
                     },
                     label = { Text("Password") },
                     placeholder = {
-                        Text(if (isAdminTab) "admin123" else "1234")
+                        Text("Enter your password")
                     },
                     leadingIcon = {
                         Icon(Icons.Default.Lock, contentDescription = null)
@@ -284,10 +286,38 @@ fun LoginScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
+
+                TextButton(onClick = { viewModel.refreshFromCloud() }) {
+                    Icon(
+                        imageVector = when (syncStatus) {
+                            SupabaseSync.SyncStatus.SYNCING -> Icons.Default.CloudSync
+                            SupabaseSync.SyncStatus.SYNCED -> Icons.Default.CloudDone
+                            SupabaseSync.SyncStatus.OFFLINE -> Icons.Default.CloudOff
+                            SupabaseSync.SyncStatus.IDLE -> Icons.Default.CloudQueue
+                        },
+                        contentDescription = "Supabase Sync",
+                        tint = when (syncStatus) {
+                            SupabaseSync.SyncStatus.SYNCED -> Color(0xFF0F766E)
+                            SupabaseSync.SyncStatus.OFFLINE -> Color(0xFFB91C1C)
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = when (syncStatus) {
+                            SupabaseSync.SyncStatus.SYNCING -> "Syncing with Supabase..."
+                            SupabaseSync.SyncStatus.SYNCED -> "Supabase Cloud Connected (Tap to Refresh)"
+                            SupabaseSync.SyncStatus.OFFLINE -> "Offline Mode (Tap to Retry Cloud)"
+                            SupabaseSync.SyncStatus.IDLE -> "Connecting to Cloud..."
+                        },
+                        fontSize = 11.sp
+                    )
+                }
 
                 Text(
-                    text = "Admin: admin / admin123  •  Nurse default: 1234\nNasir, RN — Bangladesh Hospital NMS",
+                    text = "Authorized Hospital Staff Only • Contact Admin for Login Help\nNasir, RN — Bangladesh Hospital NMS",
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -332,7 +362,7 @@ fun RegisterNurseDialog(
     var workplace by remember { mutableStateOf("") }
     var joinDate by remember { mutableStateOf("") }
     var course by remember { mutableStateOf("") }
-    var pass by remember { mutableStateOf("1234") }
+    var pass by remember { mutableStateOf("") }
     var validationError by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
@@ -514,7 +544,9 @@ fun RegisterNurseDialog(
                 OutlinedTextField(
                     value = pass,
                     onValueChange = { pass = it },
-                    label = { Text("Set Password") },
+                    label = { Text("Create Password *") },
+                    placeholder = { Text("Minimum 6 characters") },
+                    visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -525,6 +557,10 @@ fun RegisterNurseDialog(
                 onClick = {
                     if (name.isBlank() || phone.isBlank() || hris.isBlank()) {
                         validationError = "Name, Phone No. and HRIS ID are required."
+                        return@Button
+                    }
+                    if (pass.trim().length < 6) {
+                        validationError = "Please create a password with at least 6 characters."
                         return@Button
                     }
                     val newNurse = Nurse(
@@ -541,7 +577,7 @@ fun RegisterNurseDialog(
                         workplace = workplace.trim(),
                         joinDate = joinDate.trim(),
                         course = course.trim(),
-                        pass = pass.ifBlank { "1234" },
+                        pass = pass.trim(),
                         status = "pend"
                     )
                     onSubmit(newNurse)

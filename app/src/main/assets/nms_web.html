@@ -2,6 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>NURSES MANAGEMENT SYSTEM (NMS) BY NASIR</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#f4f7f9;--card:#fff;--tx:#1b2a33;--mu:#667985;--pr:#0f766e;--bd:#d8e2e7;--dg:#c0392b;--tkb:#fff1f0;--tkc:#d00000;--rb:#fde3e1}
 @media(prefers-color-scheme:dark){:root{--bg:#10191e;--card:#18242b;--tx:#e6eef2;--mu:#93a6b1;--pr:#2dd4bf;--bd:#2b3d47;--dg:#f07167;--tkb:#2a1514;--tkc:#ff6b6b;--rb:#4a1f1d}}
@@ -121,7 +122,15 @@ function load(){try{db=JSON.parse(localStorage.getItem('nurseapp'))}catch(e){}
  if(!db.doMoved){db.leaveTypes=db.leaveTypes.filter(x=>x.c!='D/O'&&x.c!='DO');db.leaves=db.leaves.filter(l=>{if(l.type!='D/O'&&l.type!='DO')return true;if(l.stage!='REJ'){const w=(db.nurses.find(n=>n.id==l.nurse)||{}).ward||'';dayList(l.from,l.to).forEach(d=>{if(l.stage=='OK'||l.stage=='FIN'){const k=d+'|'+w+'|D',a=db.roster[k]=db.roster[k]||[];if(!a.includes(l.nurse))a.push(l.nurse)}else db.rq.push({id:uid(),type:'duty',nurse:l.nurse,date:d,ward:w,shift:'D',stage:l.stage})})}return false});db.doMoved=1}
  db.nurses.forEach(n=>{n.st=n.st||'ok';n.cat=n.cat||'Staff Nurse';n.hris=n.hris||'';n.x=n.x||{}});
  db.leaves.forEach(l=>{if(!l.stage)l.stage=l.status=='Approved'?'OK':l.status=='Rejected'?'REJ':'SUP'})}
-function save(){try{localStorage.setItem('nurseapp',JSON.stringify(db))}catch(e){alert('Save failed')}}
+function save(){try{localStorage.setItem('nurseapp',JSON.stringify(db))}catch(e){alert('Save failed')}sbPush()}
+const SB_URL='https://wamrccojljrgavnwhfey.supabase.co',SB_KEY='sb_publishable_4R4gyeI1WsqbsPagEwTAxA_JuEjWFQq';
+let sbCli=null,sbStatus='syncing',sbPushTimer=null,sbLastPush=0;
+try{if(window.supabase)sbCli=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){}
+function sbBadge(){const m={synced:'☁ Cloud Synced',syncing:'⏳ Syncing...',offline:'⚠ Offline'};return `<button type="button" onclick="sbPull(true)" title="Sync with Supabase Cloud">${m[sbStatus]||'☁ Sync'}</button> `}
+function sbUi(){const e=document.getElementById('sbStat');if(e)e.innerHTML=sbBadge()}
+function sbPush(){if(sbPushTimer)clearTimeout(sbPushTimer);sbPushTimer=setTimeout(async()=>{sbStatus='syncing';sbUi();try{sbLastPush=Date.now();const r=await fetch(SB_URL+'/rest/v1/nms_state?on_conflict=id',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:'main',data:db,updated_at:new Date().toISOString()})});sbStatus=r.ok?'synced':'offline'}catch(e){sbStatus='offline'}sbUi()},250)}
+async function sbPull(manual){sbStatus='syncing';sbUi();try{const r=await fetch(SB_URL+'/rest/v1/nms_state?id=eq.main&select=data',{headers:{apikey:SB_KEY,Accept:'application/json'}});if(!r.ok)throw new Error('HTTP '+r.status);const rows=await r.json();if(rows&&rows.length&&rows[0].data){const raw=JSON.stringify(rows[0].data),prev=localStorage.getItem('nurseapp');if(raw!==prev){localStorage.setItem('nurseapp',raw);load();const a=document.activeElement;if(!document.querySelector('#modal')&&!(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)))R()}sbStatus='synced';if(manual)toast('☁ Cloud data synced!')}else{await fetch(SB_URL+'/rest/v1/nms_state?on_conflict=id',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:'main',data:db,updated_at:new Date().toISOString()})});sbStatus='synced'}}catch(e){sbStatus='offline';if(manual)alert('Cloud sync failed: '+(e.message||e))}sbUi()}
+function sbListen(){if(!sbCli)return;try{sbCli.channel('nms-state-sync').on('postgres_changes',{event:'*',schema:'public',table:'nms_state',filter:'id=eq.main'},p=>{if(Date.now()-sbLastPush<2000)return;const d=p&&p.new&&p.new.data;if(d){localStorage.setItem('nurseapp',JSON.stringify(d));load();const a=document.activeElement;if(!document.querySelector('#modal')&&!(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)))R()}}).subscribe()}catch(e){}}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const NU=id=>db.nurses.find(n=>n.id==id)||{};
 const nm=id=>NU(id).name||'(deleted)';
@@ -174,7 +183,7 @@ function xls(name,head,rows){const q=c=>'"'+String(c??'').replace(/"/g,'""')+'"'
 function clock(){const e=$('#clk');if(e)e.textContent='📅 '+new Date().toLocaleString(L=='bn'?'bn-BD':'en-GB',{dateStyle:'full',timeStyle:'medium'})}
 setInterval(clock,1000);
 function R(){document.body.className=S.user?'':'lgin';$('#app').innerHTML=!S.user?loginV():mainV();clock();
- $('#who').innerHTML=(S.user?bell():'')+(S.user?`${isAd()?'Admin':esc(me().name)+' <span class="tag cat">'+esc(me().cat)+'</span>'} <button onclick="S.user=null;R()">${t('Logout')}</button>`:'');
+ $('#who').innerHTML=(S.user?`<span id="sbStat">${sbBadge()}</span>`+bell():'')+(S.user?`${isAd()?'Admin':esc(me().name)+' <span class="tag cat">'+esc(me().cat)+'</span>'} <button onclick="S.user=null;R()">${t('Logout')}</button>`:'');
  const len=db.news.reduce((s,n)=>s+n.text.length,0);
  $('#tk').innerHTML=db.news.length?`<div class="tick np"><span style="animation-duration:${Math.max(15,len*.2)}s">${db.news.map(n=>md(n.text)).join(' &nbsp;◆&nbsp; ')}</span></div>`:'';
  const f=db.footer;$('#ft').innerHTML=(f.h||f.a?`<div>${f.h?`<b>${esc(f.h)}</b>`:''}${f.a?' · '+esc(f.a):''}</div>`:'')+(f.l?`<div>${f.l.split('\n').filter(Boolean).map(x=>{const[a,u]=x.split('|');return u&&/^https?:/i.test(u.trim())?`<a href="${esc(u.trim())}" target="_blank" rel="noopener">${esc(a)}</a>`:esc(a)}).join(' | ')}</div>`:'')+`<div>© ${new Date().getFullYear()} Nasir, RN</div>`}
@@ -186,10 +195,14 @@ function loginV(){const ad=S.lr=='admin';return `<div class="lgw"><div class="de
 <label>${ad?t('Username'):'Phone No. (User ID)'}</label><input id="lu" inputmode="${ad?'text':'tel'}"><label>${t('Password')}</label><input id="lp" type="password" onkeydown="if(event.key=='Enter')login()">
 <button class="p" style="width:100%;margin-top:14px;padding:10px" onclick="login()">${t('Login')}</button>
 ${ad?'':`<button style="width:100%;margin-top:8px" onclick="regForm()">📝 ${t('Register')} (Admin approval required)</button>`}
-<p class="mu" style="font-size:11px;text-align:center">Admin: admin / admin123 · Nurse default password: 1234</p></div></div>`}
+<div id="sbStat" style="text-align:center;margin-top:10px">${sbBadge()}</div>
+<p class="mu" style="font-size:11px;text-align:center">Authorized Hospital Staff Only • Contact Admin for Login Help</p></div></div>`}
 function login(){const u=$('#lu').value.trim(),p=$('#lp').value;
  if(S.lr=='admin'){if(u==db.admin.u&&p==db.admin.p){S.user={role:'admin'};S.tab='nurses'}else return alert('Wrong login')}
- else{const n=db.nurses.find(n=>n.phone==u&&(n.pass||'1234')==p);if(!n)return alert('Wrong login');if(n.st=='pend')return alert('Registration is pending admin approval');S.user={role:'staff',id:n.id};S.tab='profile';S.ward=''}R();try{Notification.requestPermission()}catch(e){}welcome()}
+ else{const n=db.nurses.find(n=>n.phone==u&&(n.pass||'1234')==p);if(!n)return alert('Wrong login');if(n.st=='pend')return alert('Registration is pending admin approval');S.user={role:'staff',id:n.id};S.tab='profile';S.ward=''}R();try{Notification.requestPermission()}catch(e){}welcome();checkDefaultPw()}
+function checkDefaultPw(){const weak=isAd()?db.admin.p=='admin123':(me().pass||'1234')=='1234';if(!weak)return;
+ modal(`<h3>🔐 Security: Change Default Password</h3><p class="mu">You are currently using the default password. Please set a new private password (minimum 6 characters) to protect your account.</p><label>New Password *</label><input id="npw1" type="password" placeholder="Minimum 6 characters"><label>Confirm Password *</label><input id="npw2" type="password" placeholder="Re-enter new password"><div class="row" style="margin-top:12px"><button class="p" onclick="saveNewPw()">Update Password</button><button onclick="$('#modal').remove()">Remind Me Later</button></div>`)}
+function saveNewPw(){const a=$('#npw1').value,b=$('#npw2').value;if(!a||a.length<6)return alert('Password must be at least 6 characters');if(a!=b)return alert('Passwords do not match');if(isAd()){if(a=='admin123')return alert('Choose a different password');db.admin.p=a}else{if(a=='1234')return alert('Choose a different password');me().pass=a}save();$('#modal').remove();alert('Password updated & synced to cloud!');R()}
 function modal(h){const m=document.createElement('div');m.className='ov';m.id='modal';m.innerHTML=`<div class="card">${h}</div>`;document.body.appendChild(m)}
 function basicHtml(n,p){return BASE.map(([k,l,tp])=>`<div><label>${t(l)}</label><input id="${p}${k}" type="${tp||'text'}" value="${esc(n[k])}"></div>`).join('')+
  `<div><label>${t('Category')} *</label><select id="${p}cat">${CATS.map(c=>`<option ${n.cat==c?'selected':''}>${c}</option>`).join('')}</select></div>
@@ -399,5 +412,5 @@ function set(){const f=db.footer;return `<div class="card"><h3>Admin Login</h3><
 function holAdd(){const d=$('#hd').value;if(!d||db.hol.some(h=>h.date==d))return;db.hol.push({date:d,name:$('#hn').value.trim()});db.hol.sort((a,b)=>a.date.localeCompare(b.date));save();R()}
 function bk(){saveFile('nms-backup-'+today()+'.json',JSON.stringify(db))}
 function rs(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{JSON.parse(r.result);localStorage.setItem('nurseapp',r.result);load();save();alert('Restored');R()}catch(e){alert('Invalid file')}};r.readAsText(f)}
-load();R();
+load();R();sbPull(false);sbListen();
 </script></body></html>

@@ -16,6 +16,12 @@ class NmsViewModel(application: Application) : AndroidViewModel(application) {
 
     val repository = NmsRepository(application.applicationContext)
     val state = repository.state
+    val syncStatus = repository.syncStatus
+    val syncMessage = repository.syncMessage
+
+    fun refreshFromCloud() {
+        repository.refreshFromCloud()
+    }
 
     // Active Tab in Main Screen
     enum class MainTab(val title: String) {

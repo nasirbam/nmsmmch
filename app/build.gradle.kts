@@ -19,6 +19,9 @@ android {
     versionCode = 1
     versionName = "1.0"
 
+    buildConfigField("String", "SUPABASE_URL", "\"https://wamrccojljrgavnwhfey.supabase.co\"")
+    buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"sb_publishable_4R4gyeI1WsqbsPagEwTAxA_JuEjWFQq\"")
+
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 

@@ -17,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.SupabaseSync
 import com.example.ui.NmsViewModel
 import com.example.ui.components.TopNewsTicker
 import com.example.ui.screens.*
@@ -49,6 +51,7 @@ fun NmsApp(viewModel: NmsViewModel) {
     val currentTab by viewModel.currentTab.collectAsState()
     val currentMoreTab by viewModel.currentMoreTab.collectAsState()
     val showNotifications by viewModel.showNotifications.collectAsState()
+    val syncStatus by viewModel.syncStatus.collectAsState()
 
     // Handle Back Button
     BackHandler(enabled = currentTab == NmsViewModel.MainTab.MORE && currentMoreTab != null) {
@@ -132,6 +135,24 @@ fun NmsApp(viewModel: NmsViewModel) {
                         }
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Cloud Sync status / refresh
+                            IconButton(onClick = { viewModel.refreshFromCloud() }) {
+                                Icon(
+                                    imageVector = when (syncStatus) {
+                                        SupabaseSync.SyncStatus.SYNCING -> Icons.Default.CloudSync
+                                        SupabaseSync.SyncStatus.SYNCED -> Icons.Default.CloudDone
+                                        SupabaseSync.SyncStatus.OFFLINE -> Icons.Default.CloudOff
+                                        SupabaseSync.SyncStatus.IDLE -> Icons.Default.CloudQueue
+                                    },
+                                    contentDescription = "Cloud Sync",
+                                    tint = when (syncStatus) {
+                                        SupabaseSync.SyncStatus.SYNCED -> Color(0xFFA7F3D0)
+                                        SupabaseSync.SyncStatus.OFFLINE -> Color(0xFFFCA5A5)
+                                        else -> Color.White
+                                    }
+                                )
+                            }
+
                             // Notifications bell
                             BadgedBox(
                                 badge = {
@@ -240,6 +261,97 @@ fun NmsApp(viewModel: NmsViewModel) {
             NotificationsDialog(
                 viewModel = viewModel,
                 onDismiss = { viewModel.toggleNotifications(false) }
+            )
+        }
+
+        // Security prompt when using default password
+        val isWeakDefault = if (isAdmin) {
+            state.adminPass == "admin123"
+        } else {
+            loggedNurse?.pass == "1234"
+        }
+        var dismissedWeakPromptForUser by remember(state.currentUser) { mutableStateOf(false) }
+
+        if (isWeakDefault && !dismissedWeakPromptForUser) {
+            var newPw by remember { mutableStateOf("") }
+            var confirmPw by remember { mutableStateOf("") }
+            var pwErr by remember { mutableStateOf<String?>(null) }
+
+            AlertDialog(
+                onDismissRequest = { dismissedWeakPromptForUser = true },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Security, contentDescription = null, tint = Color(0xFFD97706))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Change Default Password", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    }
+                },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "You are currently using the default password. Please set a private password (min 6 characters) to secure hospital data.",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (pwErr != null) {
+                            Text(
+                                text = pwErr ?: "",
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        OutlinedTextField(
+                            value = newPw,
+                            onValueChange = { newPw = it; pwErr = null },
+                            label = { Text("New Password *") },
+                            visualTransformation = PasswordVisualTransformation(),
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = confirmPw,
+                            onValueChange = { confirmPw = it; pwErr = null },
+                            label = { Text("Confirm New Password *") },
+                            visualTransformation = PasswordVisualTransformation(),
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val trimmed = newPw.trim()
+                            if (trimmed.length < 6) {
+                                pwErr = "Password must be at least 6 characters."
+                                return@Button
+                            }
+                            if (trimmed != confirmPw.trim()) {
+                                pwErr = "Passwords do not match."
+                                return@Button
+                            }
+                            if ((isAdmin && trimmed == "admin123") || (!isAdmin && trimmed == "1234")) {
+                                pwErr = "Please choose a stronger password."
+                                return@Button
+                            }
+                            if (isAdmin) {
+                                viewModel.repository.saveData(state.copy(adminPass = trimmed))
+                            } else if (loggedNurse != null) {
+                                viewModel.repository.saveNurse(loggedNurse.copy(pass = trimmed))
+                            }
+                            dismissedWeakPromptForUser = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+                    ) {
+                        Text("Update & Sync")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { dismissedWeakPromptForUser = true }) {
+                        Text("Later")
+                    }
+                }
             )
         }
     }
