@@ -207,12 +207,12 @@ function modal(h){const m=document.createElement('div');m.className='ov';m.id='m
 function basicHtml(n,p){return BASE.map(([k,l,tp])=>`<div><label>${t(l)}</label><input id="${p}${k}" type="${tp||'text'}" value="${esc(n[k])}"></div>`).join('')+
  `<div><label>${t('Category')} *</label><select id="${p}cat">${CATS.map(c=>`<option ${n.cat==c?'selected':''}>${c}</option>`).join('')}</select></div>
  <div><label>${t('Ward')}</label><select id="${p}ward"><option value="">--</option>${db.wards.map(w=>`<option ${n.ward==w?'selected':''}>${esc(w)}</option>`).join('')}</select></div>`+
- (p=='pe_'?'':`<div><label>${t('Password')}</label><input id="${p}pass" value="${esc(n.pass||'1234')}"></div>`)+
+ (p=='pe_'?'':`<div><label>${t('Password')}${p=='r_'?' *':''}</label><input id="${p}pass" type="${p=='r_'?'password':'text'}" value="${p=='r_'?'':esc(n.pass||'1234')}"${p=='r_'?' placeholder="Minimum 6 characters"':''}></div>`)+
  db.fields.filter(f=>!f.sec||f.sec=='Basic'||!db.secs.includes(f.sec)).map(f=>`<div><label>${esc(f.label)}</label><input id="${p}x_${f.id}" value="${esc((n.x||{})[f.id])}"></div>`).join('')}
 function formHtml(n,p){const S2=['Basic',...db.secs];return `<div class="row">${S2.map((s,i)=>`<button type="button" class="${i?'':'on'}" onclick="fTab(this,${i})">${esc(s)}</button>`).join('')}</div>`+
  S2.map((s,i)=>`<div class="fs g" data-i="${i}" style="display:${i?'none':'grid'}">${i?db.fields.filter(f=>f.sec==s).map(f=>`<div><label>${esc(f.label)}</label><input id="${p}x_${f.id}" value="${esc((n.x||{})[f.id])}"></div>`).join(''):basicHtml(n,p)}</div>`).join('')}
 function fTab(b,i){const r=b.parentNode;r.querySelectorAll('button').forEach((x,j)=>x.className=j==i?'on':'');r.parentNode.querySelectorAll('.fs').forEach(d=>d.style.display=d.dataset.i==i?'grid':'none')}
-function readForm(p){const o={x:{}};BASE.forEach(([k])=>o[k]=$('#'+p+k).value.trim());o.cat=$('#'+p+'cat').value;o.ward=$('#'+p+'ward').value;db.fields.forEach(f=>o.x[f.id]=$('#'+p+'x_'+f.id).value);const pw=$('#'+p+'pass');if(pw)o.pass=pw.value||'1234';
+function readForm(p){const o={x:{}};BASE.forEach(([k])=>o[k]=$('#'+p+k).value.trim());o.cat=$('#'+p+'cat').value;o.ward=$('#'+p+'ward').value;db.fields.forEach(f=>o.x[f.id]=$('#'+p+'x_'+f.id).value);const pw=$('#'+p+'pass');if(pw){const pv=pw.value.trim();if(p=='r_'&&pv.length<6){alert('Password must be at least 6 characters');return null}o.pass=pv||'1234'}
  if(!o.name||!o.phone||!o.hris){alert('Name, Phone No. and HRIS ID are required');return null}return o}
 const dup=(ph,id)=>db.nurses.some(n=>n.phone==ph&&n.id!=id);
 const btns=(ok,extra='')=>`<div class="row" style="margin-top:12px"><button class="p" onclick="${ok}">${t('Save')}</button><button onclick="$('#modal').remove()">${t('Cancel')}</button></div>`;

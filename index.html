@@ -196,20 +196,22 @@ function loginV(){const ad=S.lr=='admin';return `<div class="lgw"><div class="de
 <button class="p" style="width:100%;margin-top:14px;padding:10px" onclick="login()">${t('Login')}</button>
 ${ad?'':`<button style="width:100%;margin-top:8px" onclick="regForm()">📝 ${t('Register')} (Admin approval required)</button>`}
 <div id="sbStat" style="text-align:center;margin-top:10px">${sbBadge()}</div>
-<p class="mu" style="font-size:11px;text-align:center">Admin: admin / admin123 · Nurse default password: 1234</p></div></div>`}
+<p class="mu" style="font-size:11px;text-align:center">Authorized Hospital Staff Only • Contact Admin for Login Help</p></div></div>`}
+function checkDefaultPw(){const ad=isAd(),pw=ad?db.admin.p:(me().pass||'1234');if((ad&&pw==='admin123')||(!ad&&pw==='1234')){modal(`<h3>🔒 Security Notice</h3><p class="mu">You are using the default password. Please set a new private password now.</p><label>New Password (min 6 characters)</label><input id="npw" type="password" placeholder="Enter new password"><label>Confirm Password</label><input id="npw2" type="password" placeholder="Re-enter new password"><div class="row" style="margin-top:12px"><button class="p" onclick="saveNewPw()">Update Password</button><button onclick="$('#modal').remove()">Later</button></div>`)}}
+function saveNewPw(){const a=$('#npw').value.trim(),b=$('#npw2').value.trim();if(a.length<6)return alert('Password must be at least 6 characters');if(a!==b)return alert('Passwords do not match');if(a==='admin123'||a==='1234')return alert('Please choose a stronger password');if(isAd())db.admin.p=a;else me().pass=a;save();$('#modal').remove();alert('Password updated and synced to cloud!')}
 function login(){const u=$('#lu').value.trim(),p=$('#lp').value;
  if(S.lr=='admin'){if(u==db.admin.u&&p==db.admin.p){S.user={role:'admin'};S.tab='nurses'}else return alert('Wrong login')}
- else{const n=db.nurses.find(n=>n.phone==u&&(n.pass||'1234')==p);if(!n)return alert('Wrong login');if(n.st=='pend')return alert('Registration is pending admin approval');S.user={role:'staff',id:n.id};S.tab='profile';S.ward=''}R();try{Notification.requestPermission()}catch(e){}welcome()}
+ else{const n=db.nurses.find(n=>n.phone==u&&(n.pass||'1234')==p);if(!n)return alert('Wrong login');if(n.st=='pend')return alert('Registration is pending admin approval');S.user={role:'staff',id:n.id};S.tab='profile';S.ward=''}R();try{Notification.requestPermission()}catch(e){}welcome();checkDefaultPw()}
 function modal(h){const m=document.createElement('div');m.className='ov';m.id='modal';m.innerHTML=`<div class="card">${h}</div>`;document.body.appendChild(m)}
 function basicHtml(n,p){return BASE.map(([k,l,tp])=>`<div><label>${t(l)}</label><input id="${p}${k}" type="${tp||'text'}" value="${esc(n[k])}"></div>`).join('')+
  `<div><label>${t('Category')} *</label><select id="${p}cat">${CATS.map(c=>`<option ${n.cat==c?'selected':''}>${c}</option>`).join('')}</select></div>
  <div><label>${t('Ward')}</label><select id="${p}ward"><option value="">--</option>${db.wards.map(w=>`<option ${n.ward==w?'selected':''}>${esc(w)}</option>`).join('')}</select></div>`+
- (p=='pe_'?'':`<div><label>${t('Password')}</label><input id="${p}pass" value="${esc(n.pass||'1234')}"></div>`)+
+ (p=='pe_'?'':`<div><label>${t('Password')}${p=='r_'?' *':''}</label><input id="${p}pass" type="${p=='r_'?'password':'text'}" value="${p=='r_'?'':esc(n.pass||'1234')}"${p=='r_'?' placeholder="Minimum 6 characters"':''}></div>`)+
  db.fields.filter(f=>!f.sec||f.sec=='Basic'||!db.secs.includes(f.sec)).map(f=>`<div><label>${esc(f.label)}</label><input id="${p}x_${f.id}" value="${esc((n.x||{})[f.id])}"></div>`).join('')}
 function formHtml(n,p){const S2=['Basic',...db.secs];return `<div class="row">${S2.map((s,i)=>`<button type="button" class="${i?'':'on'}" onclick="fTab(this,${i})">${esc(s)}</button>`).join('')}</div>`+
  S2.map((s,i)=>`<div class="fs g" data-i="${i}" style="display:${i?'none':'grid'}">${i?db.fields.filter(f=>f.sec==s).map(f=>`<div><label>${esc(f.label)}</label><input id="${p}x_${f.id}" value="${esc((n.x||{})[f.id])}"></div>`).join(''):basicHtml(n,p)}</div>`).join('')}
 function fTab(b,i){const r=b.parentNode;r.querySelectorAll('button').forEach((x,j)=>x.className=j==i?'on':'');r.parentNode.querySelectorAll('.fs').forEach(d=>d.style.display=d.dataset.i==i?'grid':'none')}
-function readForm(p){const o={x:{}};BASE.forEach(([k])=>o[k]=$('#'+p+k).value.trim());o.cat=$('#'+p+'cat').value;o.ward=$('#'+p+'ward').value;db.fields.forEach(f=>o.x[f.id]=$('#'+p+'x_'+f.id).value);const pw=$('#'+p+'pass');if(pw)o.pass=pw.value||'1234';
+function readForm(p){const o={x:{}};BASE.forEach(([k])=>o[k]=$('#'+p+k).value.trim());o.cat=$('#'+p+'cat').value;o.ward=$('#'+p+'ward').value;db.fields.forEach(f=>o.x[f.id]=$('#'+p+'x_'+f.id).value);const pw=$('#'+p+'pass');if(pw){const pv=pw.value.trim();if(p=='r_'&&pv.length<6){alert('Password must be at least 6 characters');return null}o.pass=pv||'1234'}
  if(!o.name||!o.phone||!o.hris){alert('Name, Phone No. and HRIS ID are required');return null}return o}
 const dup=(ph,id)=>db.nurses.some(n=>n.phone==ph&&n.id!=id);
 const btns=(ok,extra='')=>`<div class="row" style="margin-top:12px"><button class="p" onclick="${ok}">${t('Save')}</button><button onclick="$('#modal').remove()">${t('Cancel')}</button></div>`;
