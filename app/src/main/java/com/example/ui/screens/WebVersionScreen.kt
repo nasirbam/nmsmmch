@@ -68,6 +68,13 @@ fun WebVersionScreen(
                     settings.useWideViewPort = true
                     settings.loadWithOverviewMode = true
 
+                    addJavascriptInterface(object {
+                        @android.webkit.JavascriptInterface
+                        fun printHtml(html: String, jobName: String) {
+                            com.example.ui.util.RosterPrinter.printHtml(context, jobName, html)
+                        }
+                    }, "AndroidPrint")
+
                     webViewClient = WebViewClient()
                     webChromeClient = WebChromeClient()
 

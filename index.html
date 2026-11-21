@@ -49,7 +49,7 @@ th,td{border-bottom:1px solid var(--bd);padding:7px;text-align:left;vertical-ali
 .ov{position:fixed;inset:0;background:#0008;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:20px;z-index:60}
 .ov .card{max-width:680px;width:100%}.mu{color:var(--mu)}.tag{font-size:12px;padding:2px 8px;border-radius:10px;background:var(--bd)}
 @media(max-width:600px){main{padding:8px}nav{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}nav button{white-space:nowrap}th,td{padding:5px;font-size:13px}.ov{padding:6px}header b{font-size:12.5px}}
-@media print{.top,header,nav,.np,.tick{display:none!important}body{background:#fff}}
+@media print{.top,header,nav,.np,.tick{display:none!important}body{background:#fff}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}.tw{overflow:visible!important}table{min-width:0!important;width:100%!important}body.rp #app,body.rp #ft,body.rp #modal{display:none!important}body.rp #rPrint{display:block!important}}
 
 /* ---- theme v5 ---- */
 :root{--bg:#eaf3fb;--pr:#0d9488;--ac:#6366f1;--th:#e0f2fe;--thc:#075985;--sh:0 4px 14px #0f766e22}
@@ -87,12 +87,23 @@ body.lgin .lg button.p{padding:11px}
 @media(prefers-color-scheme:dark){.tD{background:#164e63;color:#a5f3fc}}.rt th.fr .dn{color:#b45309}.rt th.ho .dn{color:#166534}
 .hl{display:inline-block;padding:2px 9px;border-radius:10px;font-size:12px;margin:2px;color:#111}.hl.fr{background:#fde68a}.hl.ho{background:#86efac}
 @media(prefers-color-scheme:dark){.rt td.fr,.rt th.fr{background:#78560a!important;color:#fff}.rt td.ho,.rt th.ho{background:#14532d!important;color:#fff}.rt th.fr .dn,.rt th.ho .dn{color:#fff}}
+.rt th.tdy{background:#fde047!important;color:#7c2d12!important}.rt th.tdy .dn{color:#7c2d12!important}
+#rPrint{display:none}
+.rp-tbl{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:8px}
+.rp-tbl th,.rp-tbl td{border:1px solid #334155;padding:6px 5px;text-align:center;font-size:12px;word-wrap:break-word}
+.rp-tbl th{background:#e2e8f0;color:#0f172a}
+.rp-tbl td.nm{text-align:left;font-weight:600}
+.rp-tbl th.rp-tdy{background:#fde047!important;color:#7c2d12!important;border:2px solid #b45309!important}
+.rp-tbl td.rp-tdy{background:#fef9c3!important;border-left:2px solid #b45309!important;border-right:2px solid #b45309!important;font-weight:800}
+.rp-tbl tr:last-child td.rp-tdy{border-bottom:2px solid #b45309!important}
+.rp-bdg{display:inline-block;background:#b45309;color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;margin-bottom:2px}
 </style></head><body>
 <div class="top np" id="clk"></div>
 <header class="np"><b>🩺 NURSES MANAGEMENT SYSTEM (NMS) BY NASIR</b><span id="who"></span></header>
 <div id="tk"></div>
 <main id="app"></main>
 <footer id="ft"></footer>
+<div id="rPrint"></div>
 <script>
 const L='en';
 const t=s=>s;
@@ -107,7 +118,9 @@ const STL={NI:'Pending: Nurse Incharge',SUP:'Pending: Nursing Supervisor',FIN:'P
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=s=>document.querySelector(s);
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b><u>$1</u></b>');
-const today=()=>new Date().toISOString().slice(0,10);
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const addDays=(ymd,n)=>{const [y,m,d]=ymd.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
+const fmtPD=ymd=>{const [y,m,d]=ymd.split('-').map(Number),dt=new Date(Date.UTC(y,m-1,d)),mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getUTCMonth()];return `${String(d).padStart(2,'0')} ${mn} ${y} (${DN[dt.getUTCDay()]})`};
 let db,S={user:null,tab:'nurses',ward:'',wk:today(),q:'',ad:today(),ld:today(),lt:'',lm:'on',lw:'',lg:'',am:today().slice(0,7),rm:today().slice(0,7),ay:String(new Date().getFullYear()),lr:'staff'};
 const HOL26=['2026-02-04|Shab-e-Barat','2026-02-11|National Election holiday','2026-02-12|National Election holiday','2026-02-21|Shaheed Dibosh & International Mother Language Day','2026-03-17|Shab-e-Qadr','2026-03-18|Eid-ul-Fitr holiday (executive order)','2026-03-19|Eid-ul-Fitr holiday (executive order)','2026-03-20|Jumatul Wida','2026-03-21|Eid-ul-Fitr','2026-03-22|Eid-ul-Fitr holiday (executive order)','2026-03-23|Eid-ul-Fitr holiday (executive order)','2026-03-26|Independence & National Day','2026-04-14|Pohela Boishakh (Bengali New Year)','2026-05-01|May Day / Buddha Purnima','2026-05-25|Eid-ul-Adha holiday (executive order)','2026-05-26|Eid-ul-Adha holiday (executive order)','2026-05-27|Eid-ul-Adha (Eve)','2026-05-28|Eid-ul-Adha','2026-05-29|Eid-ul-Adha (2nd day)','2026-05-30|Eid-ul-Adha (3rd day)','2026-05-31|Eid-ul-Adha holiday (executive order)','2026-06-26|Ashura','2026-08-05|July Mass Uprising Day','2026-08-26|Eid-e-Miladunnabi','2026-09-04|Janmashtami','2026-10-20|Durga Puja','2026-10-21|Durga Puja (Vijaya Dashami)','2026-12-16|Victory Day','2026-12-25|Christmas Day'];
 function load(){try{db=JSON.parse(localStorage.getItem('nurseapp'))}catch(e){}
@@ -346,16 +359,46 @@ function holBulk(){let c=0;$('#hb').value.split('\n').forEach(l=>{const [d,n]=l.
 function holReload(){HOL26.forEach(x=>{const [d,n]=x.split('|');if(!db.hol.some(h=>h.date==d))db.hol.push({date:d,name:n})});db.hol.sort((a,b)=>a.date.localeCompare(b.date));save();R()}
 function rInfo(){const w=S.ward||(!isAd()&&me().ward)||db.wards[0]||'',m=S.rm,Y=+m.slice(0,4),M=+m.slice(5,7),n=new Date(Y,M,0).getDate();
  return {w,m,Y,n,ds:[...Array(n)].map((_,i)=>m+'-'+String(i+1).padStart(2,'0')),pool:db.nurses.filter(x=>x.ward==w&&x.st!='pend').sort((a,b)=>(b.cat=='Nurse Incharge')-(a.cat=='Nurse Incharge')),mn:new Date(Y,M-1,1).toLocaleString('en',{month:'long'})}}
-function roster(){const r=rk(),{w,m,Y,n,ds,pool,mn}=rInfo(),canEd=id=>r>=3||(r==2&&me().ward==w)||(r==1&&id==S.user.id),hc=d=>{const h=hday(d),f=dow(d)==5;return {c:h?'ho':f?'fr':'',t:h?((h.name||'Public holiday')+(f?' (also Friday)':'')):f?'Friday — weekly holiday':''}};
+function roster(){const r=rk(),{w,m,Y,n,ds,pool,mn}=rInfo(),td=today(),canEd=id=>r>=3||(r==2&&me().ward==w)||(r==1&&id==S.user.id),hc=d=>{const h=hday(d),f=dow(d)==5;return {c:(d==td?'tdy ':'')+(h?'ho':f?'fr':''),t:h?((h.name||'Public holiday')+(f?' (also Friday)':'')):f?'Friday — weekly holiday':''}};
  const hint=r==1?'Pick M / E / N in your own row to request a duty. Needs Nurse Incharge approval, then Nursing Supervisor approval.':r==2?'You can enter / change duty for your ward. Your entry counts as duty at once and then needs Nursing Supervisor approval.':r==3?'Your entries are final. Approve pending requests from the Approvals tab (they can also be edited here before approving).':'';
- return `<div class="card"><div class="row np"><select onchange="S.ward=this.value;R()">${db.wards.map(x=>`<option ${x==w?'selected':''}>${esc(x)}</option>`).join('')}</select><input type="month" value="${m}" onchange="S.rm=this.value||S.rm;R()" style="max-width:170px"><button onclick="print()">🖨 ${t('Print')}</button><button onclick="rX()">📊 ${t('Export Excel')}</button></div>
+ return `<div class="card"><div class="row np"><select onchange="S.ward=this.value;R()">${db.wards.map(x=>`<option ${x==w?'selected':''}>${esc(x)}</option>`).join('')}</select><input type="month" value="${m}" onchange="S.rm=this.value||S.rm;R()" style="max-width:170px"><button onclick="rPrint()">🖨 ${t('Print')}</button><button onclick="rX()">📊 ${t('Export Excel')}</button></div>
  <p class="mu np" style="font-size:12px">${hint}</p>
  <div class="row np" style="font-size:12px"><span class="chip tM">M</span>Morning 8am–2pm <span class="chip tE">E</span>Evening 2pm–8pm <span class="chip tN">N</span>Night 8pm–8am <span class="chip tD">D/O</span>Day off <span class="chip red">CL…</span>Leave <span class="chip" style="border:2px dashed #d97706">dashed</span>awaiting approval (⏳ = awaiting Nurse Incharge) <span class="hl fr">Fri</span>Weekly holiday <span class="hl ho">Date</span>Public holiday (hover a date for its name)</div>
  ${holRow(m)}
- <h4 style="margin:4px 0">Ward: ${esc(w)}</h4><div class="tw"><table class="rt"><tr><th colspan="${n+2}" style="color:red;font-size:16px;font-weight:600">${mn} ${Y}</th></tr><tr><th>SL</th><th>Name</th>${ds.map(d=>`<th class="${hc(d).c}" title="${esc(hc(d).t)}">${d.slice(8)}</th>`).join('')}</tr><tr><th></th><th>Day</th>${ds.map(d=>`<th class="${hc(d).c}" title="${esc(hc(d).t)}"><span class="dn">${DN[dow(d)]}</span></th>`).join('')}</tr>
- ${pool.map((x,i)=>`<tr class="${x.cat=='Nurse Incharge'?'inc':''}"><td>${String(i+1).padStart(2,'0')}</td><td class="nm">${esc(x.name)}${x.cat=='Nurse Incharge'?' <small>★ In-charge</small>':''}<br><small class="mu" title="D/O used / allowed this month (Fridays + govt holidays)">D/O ${doUsedM(x.id,m)}/${holN(m)}</small></td>${ds.map(d=>{const lv=onLeave(x.id,d);if(lv)return `<td class="lv" title="${esc(lv.type)}">${esc(lv.type)}</td>`;
+ <h4 style="margin:4px 0">Ward: ${esc(w)}</h4><div class="tw"><table class="rt"><tr><th colspan="${n+2}" style="color:red;font-size:16px;font-weight:600">${mn} ${Y}</th></tr><tr><th>SL</th><th>Name / HRIS ID</th>${ds.map(d=>`<th class="${hc(d).c}" title="${esc(hc(d).t)}">${d.slice(8)}</th>`).join('')}</tr><tr><th></th><th>Day</th>${ds.map(d=>`<th class="${hc(d).c}" title="${esc(hc(d).t)}"><span class="dn">${DN[dow(d)]}</span></th>`).join('')}</tr>
+ ${pool.map((x,i)=>`<tr class="${x.cat=='Nurse Incharge'?'inc':''}"><td>${String(i+1).padStart(2,'0')}</td><td class="nm">${esc(x.name)}${x.cat=='Nurse Incharge'?' <small>★ In-charge</small>':''}<br><small class="mu" title="HRIS ID & D/O used / allowed">HRIS: ${esc(x.hris||'—')} · D/O ${doUsedM(x.id,m)}/${holN(m)}</small></td>${ds.map(d=>{const lv=onLeave(x.id,d);if(lv)return `<td class="lv" title="${esc(lv.type)}">${esc(lv.type)}</td>`;
  const {s,q}=shiftOf(x.id,d,w),ed=q?(isAd()||canAct(q.stage,x)||(r==2&&me().ward==w)):(canEd(x.id)&&(r>=2||!s));
  return `<td class="${s?'t'+s:(ed?'ed0 ':'')+hc(d).c}${q?' pq':''}" ${q?`title="${q.stage=='NI'?'Waiting for Nurse Incharge approval':'Counted as duty - waiting for Nursing Supervisor approval'}"`:hc(d).t?`title="${esc(hc(d).t)}"`:''}>${ed?`<select onchange="rSet('${w}','${d}','${x.id}',this.value)"><option value="">+</option>${Object.keys(SH).map(c=>`<option value="${c}" ${s==c?'selected':''}>${SL(c)}</option>`).join('')}</select>`:(q&&q.stage=='NI'?'⏳':'')+SL(s)}</td>`}).join('')}</tr>`).join('')}</table></div></div>`}
+function rPrint(){
+ const {w,pool}=rInfo(),td=today(),yd=addDays(td,-1),tm=addDays(td,1),f=db.footer||{};
+ const cell=(id,d)=>{const lv=onLeave(id,d);if(lv)return `<b style="color:#b91c1c">${esc(lv.type)}</b>`;const {s,q}=shiftOf(id,d,w);if(!s)return '—';const col={M:'#1d4ed8',E:'#c2410c',N:'#6d28d9',D:'#15803d'}[s]||'#0f172a';return `<b style="color:${col};font-size:13px">${q?'⏳ ':''}${esc(SL(s))}</b>`};
+ const bodyHtml=`<div style="text-align:center;border-bottom:2px solid #0f766e;padding-bottom:8px;margin-bottom:10px">
+  <h2 style="margin:0;color:#0f766e;font-size:18px">${esc(f.h||'Nurses Management System (NMS)')}</h2>
+  ${f.a?`<div style="font-size:11px;color:#475569">${esc(f.a)}</div>`:''}
+  <div style="font-size:13px;font-weight:700;margin-top:3px">Duty Roster — Ward: ${esc(w)}</div>
+  <div style="font-size:11px;color:#334155">Schedule: ${fmtPD(yd)} | ${fmtPD(td)} | ${fmtPD(tm)} · Total Nurses: ${pool.length}</div>
+ </div>
+ <div style="font-size:10.5px;margin-bottom:8px;padding:5px 8px;background:#f8fafc;border:1px solid #cbd5e1"><b>Shift Key:</b> M = Morning (8am–2pm) · E = Evening (2pm–8pm) · N = Night (8pm–8am) · D/O = Day Off · CL/EL/ML = Leave</div>
+ <table class="rp-tbl"><thead><tr>
+  <th style="width:36px">SL</th><th style="width:30%;text-align:left">Name</th><th style="width:16%">HRIS ID</th>
+  <th>Previous Day<br>${fmtPD(yd)}</th>
+  <th class="rp-tdy"><span class="rp-bdg">TODAY</span><br>${fmtPD(td)}</th>
+  <th>Next Day<br>${fmtPD(tm)}</th>
+ </tr></thead><tbody>
+ ${pool.length?pool.map((x,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td class="nm">${esc(x.name)}${x.cat=='Nurse Incharge'?' <small style="color:#b45309">★ Incharge</small>':''}</td><td><b>${esc(x.hris||'—')}</b></td><td>${cell(x.id,yd)}</td><td class="rp-tdy">${cell(x.id,td)}</td><td>${cell(x.id,tm)}</td></tr>`).join(''):'<tr><td colspan="6">No nurses in this ward.</td></tr>'}
+ </tbody></table>
+ <div style="margin-top:14px;display:flex;justify-content:space-between;font-size:11px;color:#475569"><span>Printed: ${new Date().toLocaleString('en-GB')}</span><span>Signature of Controlling Officer: ____________________</span></div>`;
+ if(window.AndroidPrint){
+  const full=`<!DOCTYPE html><html><head><meta charset="utf-8"><style>@page{size:A4 portrait;margin:12mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box}body{font-family:sans-serif;color:#0f172a;margin:0}.rp-tbl{width:100%;border-collapse:collapse;table-layout:fixed}.rp-tbl th,.rp-tbl td{border:1px solid #334155;padding:6px 5px;text-align:center;font-size:12px;word-wrap:break-word}.rp-tbl th{background:#e2e8f0}.rp-tbl td.nm{text-align:left;font-weight:600}.rp-tbl th.rp-tdy{background:#fde047!important;color:#7c2d12!important;border:2px solid #b45309!important}.rp-tbl td.rp-tdy{background:#fef9c3!important;border-left:2px solid #b45309!important;border-right:2px solid #b45309!important;font-weight:800}.rp-tbl tr:last-child td.rp-tdy{border-bottom:2px solid #b45309!important}.rp-bdg{display:inline-block;background:#b45309;color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;margin-bottom:2px}</style></head><body>${bodyHtml}</body></html>`;
+  window.AndroidPrint.printHtml(full,'NMS_Roster_'+w+'_'+td);
+  return;
+ }
+ $('#rPrint').innerHTML=bodyHtml;
+ document.body.classList.add('rp');
+ const done=()=>{document.body.classList.remove('rp');window.onafterprint=null};
+ window.onafterprint=done;
+ setTimeout(()=>{window.print();setTimeout(done,1000)},50);
+}
 function rX(){const {w,m,ds,pool}=rInfo();xls('roster-'+w+'-'+m,['SL','Name',...ds.map(d=>d.slice(8)+' '+DN[dow(d)]+(hday(d)?' (H)':''))],pool.map((x,i)=>[i+1,x.name,...ds.map(d=>{const lv=onLeave(x.id,d);return lv?lv.type:SL(shiftOf(x.id,d,w).s)})]))}
 function rSet(w,d,id,s){const r=rk(),pq=db.rq.find(q=>q.type=='duty'&&q.nurse==id&&q.date==d&&q.ward==w&&NEED[q.stage]),
  other=Object.keys(db.roster).some(k=>k.startsWith(d+'|')&&!k.startsWith(d+'|'+w+'|')&&db.roster[k].includes(id))||db.rq.some(q=>q.type=='duty'&&q.nurse==id&&q.date==d&&NEED[q.stage]&&q.ward!=w),

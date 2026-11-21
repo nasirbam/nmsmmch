@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,6 +33,7 @@ import com.example.data.model.Nurse
 import com.example.data.model.NurseHierarchy
 import com.example.ui.NmsViewModel
 import com.example.ui.theme.*
+import com.example.ui.util.RosterPrinter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -111,6 +113,10 @@ fun DutyRosterScreen(
 
     val dayOffAllowed = remember(selectedMonth) {
         viewModel.repository.getDayOffAllowanceForMonth(selectedMonth)
+    }
+
+    val todayStr = remember {
+        SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
     }
 
     // Shift Assignment Dialog State
@@ -281,18 +287,20 @@ fun DutyRosterScreen(
                         modifier = Modifier.width(36.dp)
                     )
                     Text(
-                        text = "Nurse Name / Quota",
+                        text = "Name / HRIS ID",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
                         modifier = Modifier.width(150.dp)
                     )
                     dayDates.forEach { d ->
+                        val isToday = d.dateString == todayStr
                         Column(
                             modifier = Modifier
                                 .width(38.dp)
                                 .background(
                                     when {
+                                        isToday -> Color(0xFFFDE047)
                                         d.holiday != null -> HolidayHighlight
                                         d.isFriday -> FridayHighlight
                                         else -> Color.Transparent
@@ -305,13 +313,13 @@ fun DutyRosterScreen(
                                 text = String.format(Locale.US, "%02d", d.dayNumber),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (d.holiday != null || d.isFriday) Color(0xFF1E293B) else Color.White
+                                color = if (isToday || d.holiday != null || d.isFriday) Color(0xFF1E293B) else Color.White
                             )
                             Text(
                                 text = d.dayOfWeekName,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (d.holiday != null || d.isFriday) Color(0xFF475569) else Color(0xFFCCFBF1)
+                                color = if (isToday || d.holiday != null || d.isFriday) Color(0xFF475569) else Color(0xFFCCFBF1)
                             )
                         }
                     }
@@ -379,9 +387,10 @@ fun DutyRosterScreen(
                                         }
                                     }
                                     Text(
-                                        text = "D/O: $doUsed / $dayOffAllowed",
+                                        text = "HRIS: ${nurse.hris.ifBlank { "—" }} • D/O: $doUsed/$dayOffAllowed",
                                         fontSize = 10.sp,
-                                        color = if (doUsed >= dayOffAllowed) Color(0xFFB91C1C) else MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = if (doUsed >= dayOffAllowed) Color(0xFFB91C1C) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1
                                     )
                                 }
 
@@ -486,28 +495,53 @@ fun DutyRosterScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Action Buttons Row (Export CSV, Help)
+        // Action Buttons Row (Print 3-Day Roster, Export CSV)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Tap any cell with '+' to assign or request duty.",
+                text = "Prints Yesterday, Today (Highlighted) & Tomorrow.",
                 fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f).padding(end = 6.dp)
             )
 
-            Button(
-                onClick = {
-                    Toast.makeText(context, "Exported Duty Roster ($selectedWard $monthName) successfully", Toast.LENGTH_SHORT).show()
-                },
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
-            ) {
-                Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Export Excel", fontSize = 12.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        RosterPrinter.printThreeDayRoster(
+                            context = context,
+                            ward = selectedWard,
+                            nurses = wardNurses,
+                            state = state
+                        )
+                    },
+                    modifier = Modifier
+                        .heightIn(min = 48.dp)
+                        .testTag("print_roster_button"),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Icon(Icons.Default.Print, contentDescription = "Print Roster", modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Print", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                }
+
+                Button(
+                    onClick = {
+                        Toast.makeText(context, "Exported Duty Roster ($selectedWard $monthName) successfully", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier
+                        .heightIn(min = 48.dp)
+                        .testTag("export_roster_button"),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Export", fontSize = 12.sp)
+                }
             }
         }
     }
